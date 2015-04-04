@@ -34,11 +34,12 @@ public class ParDecInt extends Thread{
 			int opcodeInt;
 			String opcode = singleLines.substring(5, 9);
 			opcodeInt = Integer.parseInt(opcode, 16);
+			System.out.println(opcodeInt);
 			newInst[CodeCount] = opcodeInt;
 			CodeCount++;
 		}
 		instructions=newInst;
-		System.out.println(instructions[0]);
+		//System.out.println(instructions[0]);
 	}
 
 	public void decode(int line){

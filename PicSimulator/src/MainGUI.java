@@ -39,13 +39,12 @@ import javax.swing.table.DefaultTableModel;
 public class MainGUI extends JFrame{
 
 	private JPanel contentPane;
-	private JTable table;
-	private GUIOperations guiop = new GUIOperations();
 	public ParDecInt pdi;
 	private JButton btnStart;
-	private JButton btnStop;
-	private JTable table_1;
-	
+	public ParDecInt pardecint;
+	private RegTable regtab;
+	private JScrollPane scrollPane = new JScrollPane();
+	private Boolean checkbox;
 
 	/**
 	 * Launch the application.
@@ -82,7 +81,7 @@ public class MainGUI extends JFrame{
 		JMenuItem mntmOpen = new JMenuItem("Open");
 		mntmOpen.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent ev) {
-				guiop.openclicked(ev, table_1);
+				openclicked();
 			}
 		});
 		mnMen.add(mntmOpen);
@@ -97,7 +96,6 @@ public class MainGUI extends JFrame{
 		btnStart = new JButton("Start");
 		btnStart.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent ev) {
-				btnStop.setEnabled(true);
 		        btnStart.setEnabled(false);
 		        ParDecInt pardecintThread = new ParDecInt();
 		        pardecintThread.start(); 
@@ -106,67 +104,91 @@ public class MainGUI extends JFrame{
 		});
 		btnStart.setBounds(10, 11, 89, 23);
 		contentPane.add(btnStart);
+
 		
-		btnStop = new JButton("Stop");
-		btnStop.setEnabled(false);
-		btnStop.setBounds(109, 11, 89, 23);
-		contentPane.add(btnStop);
 		
-		JButton btnStepbystep = new JButton("Step-by-Step");
-		btnStepbystep.setBounds(208, 11, 104, 23);
-		contentPane.add(btnStepbystep);
-		
-		JButton btnBank = new JButton("Bank 1");
-		btnBank.setBounds(10, 45, 89, 23);
-		contentPane.add(btnBank);
-		
-		JButton btnBank_1 = new JButton("Bank 2");
-		btnBank_1.setBounds(109, 45, 89, 23);
-		contentPane.add(btnBank_1);
-		
-		JScrollPane scrollPane_1 = new JScrollPane();
-		scrollPane_1.setBounds(10, 79, 302, 404);
-		contentPane.add(scrollPane_1);
-		
-		table = new JTable();
-		table.setModel(new DefaultTableModel(new Object[][] {
-				{null, null},
-				{null, null},
-				{null, null},
-				{null, null},
-				{null, null},
-			},
-			new String[] {
-				"New column", "New column"
-			}
-		));
-		scrollPane_1.setViewportView(table);
-		
-		JScrollPane scrollPane = new JScrollPane();
+		/**JScrollPane scrollPane = new JScrollPane();
 		scrollPane.setBounds(358, 15, 698, 465);
-		contentPane.add(scrollPane);
-		
+		contentPane.add(scrollPane);		
 		table_1 = new JTable();
-		table_1.setModel(new DefaultTableModel(
-			new Object[][] {
-			},
-			new String[] {
-				"BP", "Code"
-			}
-		) {
-			boolean[] columnEditables = new boolean[] {
-				true, false
-			};
-			public boolean isCellEditable(int row, int column) {
-				return columnEditables[column];
-			}
-		});
-		table_1.getColumnModel().getColumn(0).setPreferredWidth(23);
-		table_1.getColumnModel().getColumn(0).setMaxWidth(25);
-		table_1.getColumnModel().getColumn(1).setResizable(false);
-		table_1.getColumnModel().getColumn(1).setPreferredWidth(475);
-		scrollPane.setViewportView(table_1);
+		upt.UpdateTable(table_1,null);
+		scrollPane.setViewportView(table_1);**/
 		
+		
+		scrollPane.setBounds(358, 15, 698, 465);
+		contentPane.add(scrollPane);		
+		regtab = new RegTable(scrollPane);
+		
+	}	
+	
+	public void openclicked() {
+		
+		File file =null;
+		//boolean markerZeileLeer = false;
+		/** Öffnen des Dialogs für die Auswahl der Datei**/
+		JFileChooser open = new JFileChooser();
+		open.setDialogTitle("Datei öffnen");
+		/** rVal bekommt bei bestätigen eine Konstante übergeben**/
+		int rVal = open.showOpenDialog(null);
+		/**Prüfen der Konstante**/
+		if (rVal == JFileChooser.APPROVE_OPTION) {
+            file = open.getSelectedFile();
+            regtab.removeAll();
+            readandwrite(file);
+        }else if(rVal==JFileChooser.CANCEL_OPTION){
+        	System.out.println("JFileChooser canceled");
+        }
+	}
+		
+	private void readandwrite(File file){
+		String[] Buffer; //Buffer für Programmcode
+		int j= 0;
+		int lineCount = 0;
+		String record = null;
+		try{
+			FileReader fr = new FileReader(file);
+			BufferedReader br = new BufferedReader(fr);
+			BufferedReader countbr = new BufferedReader(new FileReader(file));
+			/**Zählen der Zeilen mit Programmcode**/
+			while ((record = countbr.readLine()) != null) {
+	            if (!record.startsWith("    ")) {
+	                lineCount++;
+	            }
+	        }
+			Buffer = new String[lineCount];
+			Vector tableData = new Vector(); //Vector für Tabellen Daten
+	        while ((record = br.readLine()) != null) {
+	        	Vector vec = new Vector();
+	        	if (!record.startsWith("    ")) {
+	        		Buffer[j] = record; //Schreibt Programmcode in den Buffer
+	        		j++;
+	        	}
+	        	vec.add(checkbox); //Erste Spalte der Tabelle ist eine Checkbox
+	        	record = record.substring(20); //schneidet die ersten 20 Zeichen vom Code weg
+	        	vec.add(record + "\n"); //Übergibt den Codeteil an Vector in Spalte zwei
+	        	tableData.addElement(vec); //Schreibt Spalte eins und zwei in den Tabellenvektor
+	        	
+	        	
+	           /**Vector<Object> vector = new Vector<Object>();
+	           for (int i = 0; i < list.getModel().getSize(); i++) {
+	                vector.add(list.getModel().getElementAt(i));
+	            }
+	            Buffer[j] = record;
+	            j++;
+	            record = record.substring(20);
+	            vector.add(record + "\n");
+				list.setListData(vector);**/
+	        	//System.out.println(tableData);
+	        }
+	        regtab.setTable(scrollPane, tableData);
+	        pardecint = new ParDecInt(Buffer);
+	        br.close();
+			countbr.close();
+			//System.out.println(Buffer[1]);
+		}catch (IOException e) {
+            System.out.println("Es ist ein Fehler beim lesen der Datei aufgetreten");
+            e.printStackTrace();
+        }
 	}
 	
 	private static void addPopup(Component component, final JPopupMenu popup) {
