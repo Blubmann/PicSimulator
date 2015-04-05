@@ -4,6 +4,7 @@ import java.awt.EventQueue;
 import javax.swing.JFrame;
 import javax.swing.JPanel;
 import javax.swing.border.EmptyBorder;
+import javax.swing.filechooser.FileNameExtensionFilter;
 import javax.swing.JButton;
 import javax.swing.JMenuBar;
 import javax.swing.JMenu;
@@ -39,7 +40,6 @@ import javax.swing.table.DefaultTableModel;
 public class MainGUI extends JFrame{
 
 	private JPanel contentPane;
-	public ParDecInt pdi;
 	private JButton btnStart;
 	public ParDecInt pardecint;
 	private RegTable regtab;
@@ -103,18 +103,7 @@ public class MainGUI extends JFrame{
 			}
 		});
 		btnStart.setBounds(10, 11, 89, 23);
-		contentPane.add(btnStart);
-
-		
-		
-		/**JScrollPane scrollPane = new JScrollPane();
-		scrollPane.setBounds(358, 15, 698, 465);
-		contentPane.add(scrollPane);		
-		table_1 = new JTable();
-		upt.UpdateTable(table_1,null);
-		scrollPane.setViewportView(table_1);**/
-		
-		
+		contentPane.add(btnStart);		
 		scrollPane.setBounds(358, 15, 698, 465);
 		contentPane.add(scrollPane);		
 		regtab = new RegTable(scrollPane);
@@ -122,16 +111,18 @@ public class MainGUI extends JFrame{
 	}	
 	
 	public void openclicked() {
-		
 		File file =null;
-		//boolean markerZeileLeer = false;
 		/** Öffnen des Dialogs für die Auswahl der Datei**/
 		JFileChooser open = new JFileChooser();
 		open.setDialogTitle("Datei öffnen");
+		/**Begrenzt die Auswahl auf lst-Files**/
+		open.setAcceptAllFileFilterUsed(false);
+		open.addChoosableFileFilter(new FileNameExtensionFilter("LST-Files", "*.lst"));
 		/** rVal bekommt bei bestätigen eine Konstante übergeben**/
 		int rVal = open.showOpenDialog(null);
-		/**Prüfen der Konstante**/
+		/**Prüfen einer Konstante, welcher Button gedrückt wurde**/
 		if (rVal == JFileChooser.APPROVE_OPTION) {
+			/**Ausgewählte Datei wird gespeichert, die Codetabelle auf der GUI wird gelöscht, die Datei wird weitergereicht**/
             file = open.getSelectedFile();
             regtab.removeAll();
             readandwrite(file);
@@ -149,7 +140,7 @@ public class MainGUI extends JFrame{
 			FileReader fr = new FileReader(file);
 			BufferedReader br = new BufferedReader(fr);
 			BufferedReader countbr = new BufferedReader(new FileReader(file));
-			/**Zählen der Zeilen mit Programmcode**/
+			/**Zählen der Zeilen mit Programmcode um ein entsprechende Arraygröße für relevanten Code zu erstellen**/
 			while ((record = countbr.readLine()) != null) {
 	            if (!record.startsWith("    ")) {
 	                lineCount++;
@@ -157,16 +148,23 @@ public class MainGUI extends JFrame{
 	        }
 			Buffer = new String[lineCount];
 			Vector tableData = new Vector(); //Vector für Tabellen Daten
+			/**File wird Zeile für Zeile ausgelesen und die relevanten Codezeilen in das Array Buffer geschrieben,
+			 * Der komplette Quellcode wird in ein Vektor geschrieben und über setTable auf der GUI angezeigt
+			 */
 	        while ((record = br.readLine()) != null) {
 	        	Vector vec = new Vector();
+	        	/**Relevanten Code filtern**/
 	        	if (!record.startsWith("    ")) {
-	        		Buffer[j] = record; //Schreibt Programmcode in den Buffer
+	        		Buffer[j] = record;
 	        		j++;
 	        	}
-	        	vec.add(checkbox); //Erste Spalte der Tabelle ist eine Checkbox
-	        	record = record.substring(20); //schneidet die ersten 20 Zeichen vom Code weg
-	        	vec.add(record + "\n"); //Übergibt den Codeteil an Vector in Spalte zwei
-	        	tableData.addElement(vec); //Schreibt Spalte eins und zwei in den Tabellenvektor
+	        	/**Vektor eins wird ein Boolean(für die Checkboxes). Vektor zwei wird der Sourcecode, 
+	        	 * wobei die ersten 20 Zeichen abgeschnitten werden, da diese nicht dargestellt werden müssen
+	        	 */
+	        	vec.add(checkbox); 
+	        	record = record.substring(20);
+	        	vec.add(record + "\n");
+	        	tableData.addElement(vec);
 	        	
 	        	
 	           /**Vector<Object> vector = new Vector<Object>();

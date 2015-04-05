@@ -1,10 +1,4 @@
-
-
 import java.util.Vector;
- 
-
-
-
 import javax.swing.DefaultCellEditor;
 import javax.swing.JCheckBox;
 import javax.swing.JFrame;
@@ -15,6 +9,8 @@ import javax.swing.table.DefaultTableModel;
  
 public class RegTable extends JTable{
 	JCheckBox checkBox = new javax.swing.JCheckBox(); 
+	
+	/**Initialisiert die Tabelle beim Starten des Programms**/
 	public RegTable(JScrollPane scrollPane){
 		Vector title = new Vector();
 		title.add( "BP" );
@@ -36,6 +32,7 @@ public class RegTable extends JTable{
 		table.getColumnModel().getColumn(1).setPreferredWidth(475);
 	}
 	
+	/**Setzt den Inhalt der Tabelle nach dem öffnen eines lst-Files**/
 	public void setTable(JScrollPane scrollPane, Vector vec){
 		Vector title = new Vector();
 		title.add( "BP" );
