@@ -117,7 +117,7 @@ public class MainGUI extends JFrame{
 		open.setDialogTitle("Datei öffnen");
 		/**Begrenzt die Auswahl auf lst-Files**/
 		open.setAcceptAllFileFilterUsed(false);
-		open.addChoosableFileFilter(new FileNameExtensionFilter("LST-Files", "*.lst"));
+		open.addChoosableFileFilter(new FileNameExtensionFilter("LST-Files", "LST"));
 		/** rVal bekommt bei bestätigen eine Konstante übergeben**/
 		int rVal = open.showOpenDialog(null);
 		/**Prüfen einer Konstante, welcher Button gedrückt wurde**/
