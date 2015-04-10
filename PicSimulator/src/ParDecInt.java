@@ -3,12 +3,14 @@ public class ParDecInt extends Thread{
 	public String[] code;
 	public static int[] instructions;
 	private Thread t;
+	private Register reg = new Register();
 	
 	public void run() {
 		//System.out.println(instructions[0]);
 		//System.out.println("Test");
 		for (int i = 0; i <= (instructions.length - 1); i++) {
 			decode(i);
+			reg.printRegister();
 		}
 		
 	}
