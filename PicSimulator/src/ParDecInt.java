@@ -3,27 +3,28 @@ public class ParDecInt extends Thread{
 	public String[] code;
 	public static int[] instructions;
 	private Thread t;
-	private Register reg = new Register();
+	private static PicCPU cpu = new PicCPU();
+	public static Register reg = new Register();
 	
-	public void run() {
+	public void run(){
 		//System.out.println(instructions[0]);
 		//System.out.println("Test");
+		reg.setWReg(10);
 		for (int i = 0; i <= (instructions.length - 1); i++) {
 			decode(i);
-			reg.printRegister();
 		}
-		
+		reg.printRegister();
+		System.out.println("PCL: "+reg.getPC());
 	}
 	
-	  public void start ()
-	   {
+    public void start (){
 	      //System.out.println("Starting");
 	      if (t == null)
 	      {
 	         t = new Thread (this);
 	         t.start ();
 	      }
-	   }
+	}
 	public ParDecInt(){
 		
 	}
@@ -34,13 +35,13 @@ public class ParDecInt extends Thread{
 	public ParDecInt(String[] icode){
 		this.code = icode;
 		int CodeCount = 0;		
-		int[] newInst = new int[this.code.length + 1]; 
+		int[] newInst = new int[this.code.length]; 
 		
 		for(String singleLines : code){			
 			int opcodeInt;
 			String opcode = singleLines.substring(5, 9);
 			opcodeInt = Integer.parseInt(opcode, 16);
-			System.out.println(opcodeInt);
+			System.out.println("Dezimaler Befehlscode "+opcodeInt);
 			newInst[CodeCount] = opcodeInt;
 			CodeCount++;
 		}
@@ -56,6 +57,8 @@ public class ParDecInt extends Thread{
             int f = instructions[line] & 127;
             int d = instructions[line] & 128;
             System.out.println("ADDWF, f ist " + f +" d ist " + d);
+            cpu.addWF(f, d);
+
 		}
 		else if (instructions[line] >= 1792 && instructions[line] <= 2047) {
             int f = instructions[line] & 127;

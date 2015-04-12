@@ -1,54 +1,86 @@
 public class PicCPU {
-	Register reg = new Register();
 	
 	
 	public void addWF(int f, int d){
-		int fBuf = f;
-		int w = reg.getWReg();
+		f= getIndirectAdress(f);
+		int w = ParDecInt.reg.getWReg();
 		int buf;
-		if(reg.getBank()==0){
-			buf = reg.getRegister0(fBuf) + w;
+		if(ParDecInt.reg.getBank()==0){
+			buf = ParDecInt.reg.getRegister0(f) + w;
 		}else{
-			buf = reg.getRegister1(fBuf) + w;
+			buf = ParDecInt.reg.getRegister1(f) + w;
 		}
-		setCZFlag(buf);
+		setCFlag(buf);
+		setZFlag(buf);
 		checkDandInsert(buf,f,d);
-		reg.increasePC();
+		ParDecInt.reg.increasePC();
 	}
 	
-	public void setCZFlag(int val){
+	public void addLW(int k){
+		int w = ParDecInt.reg.getWReg();
+		int buf = w+k;
+	}
+	
+	/**Prüft ob f gesetzt ist. Wenn nein, wird 
+	 * der Inhalt im FSR übergeben
+	 */
+	public int getIndirectAdress(int f){
+		if(f==0){
+			return ParDecInt.reg.getRegister0(ParDecInt.reg.fsr);
+		} else{
+			return f;
+		}
+	}
+	
+	/**Wenn das Erbebnis einer Addition > 255 ist, muss
+	 * das C-Flag gesetzt werden
+	 */
+	private void setCFlag(int val){
 		if(val>255){
-			reg.setStatusReg(reg.cFlag, 1);
-			if (val - 255 == 0) {
-                reg.setStatusReg(reg.zFlag, 1);
-            } else {
-                reg.setStatusReg(reg.zFlag, 0);
-            }
-		} else {
-            reg.setStatusReg(reg.cFlag, 0);
-            if (val == 0) {
-                reg.setStatusReg(reg.zFlag, 1);
-            } else {
-                reg.setStatusReg(reg.zFlag, 0);
-            }
-
-        }
+			ParDecInt.reg.setStatusReg(ParDecInt.reg.cFlag, 1);
+		}else {
+			ParDecInt.reg.setStatusReg(ParDecInt.reg.cFlag, 0);
+		}    
 	}
 	
+	/**Wenn das Ergebnis von arithmetischen/logischen 
+	 * Operation 0 ist, wird das Z-Flag gesetzt
+	 */
+	private void setZFlag(int val){
+		if (val==0){
+			ParDecInt.reg.setStatusReg(ParDecInt.reg.zFlag, 1);
+		}
+		if (val>0){
+			ParDecInt.reg.setStatusReg(ParDecInt.reg.zFlag, 0);
+		}
+	}
+	
+	/**Prüft ob d gesetzt, um zu entscheiden ob in W 
+	 * oder ins Register geschrieben wird. Bei Zahlen > 255
+	 * wird entsprechend subtrahiert 
+	 */
 	public void checkDandInsert(int buf, int f, int d){
 			if(d==0){
 				if(buf > 255){
 					buf = buf-255;
-					reg.setWReg(buf);
+					ParDecInt.reg.setWReg(buf);
 				}else{
-					reg.setWReg(buf);
+					ParDecInt.reg.setWReg(buf);
 				}
 			}else{
 				if(buf > 255){
 					buf = buf -255;
-					reg.setRegister0(f, buf);
+					if(ParDecInt.reg.getBank()==0){
+						ParDecInt.reg.setRegister0(f, buf);
+					} else{
+						ParDecInt.reg.setRegister1(f, buf);
+					}
 				}else{
-					reg.setRegister0(f, buf);
+					if(ParDecInt.reg.getBank()==0){
+						ParDecInt.reg.setRegister0(f, buf);
+					} else{
+						ParDecInt.reg.setRegister1(f, buf);
+					}
 				}
 			}
 	}
