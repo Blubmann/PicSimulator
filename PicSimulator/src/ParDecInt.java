@@ -12,8 +12,8 @@ public class ParDecInt extends Thread{
 		for (int i = 0; i <= (instructions.length - 1); i++) {
 			decode(i);
 		}
-		reg.printRegister();
-		System.out.println("PCL: "+reg.getPC());
+		//reg.printRegister();
+		//System.out.println("PCL: "+reg.getPC());
 	}
 	
     public void start (){
