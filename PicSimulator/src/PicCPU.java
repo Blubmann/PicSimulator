@@ -75,10 +75,24 @@ public class PicCPU {
 		}else{
 			buf = ParDecInt.reg.getRegister1(f) - 1;
 		}
-		setCFlag(buf);
 		setZFlag(buf);
 		buf = valbigger255(buf);
 		checkDandInsert(buf,f,d);
+		ParDecInt.reg.increasePC();
+	}
+	public void decfsz(int f, int d){
+		f= getIndirectAdress(f);
+		int buf;
+		if(ParDecInt.reg.getBank()==0){
+			buf = ParDecInt.reg.getRegister0(f) - 1;
+		}else{
+			buf = ParDecInt.reg.getRegister1(f) - 1;
+		}
+		setZFlag(buf);
+		checkDandInsert(buf,f,d);
+		if(buf==0){
+			nop();
+		}
 		ParDecInt.reg.increasePC();
 	}
 	
