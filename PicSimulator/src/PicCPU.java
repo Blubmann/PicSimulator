@@ -1,5 +1,14 @@
 public class PicCPU {
 	
+	public void addLW(int k){
+		int w = ParDecInt.reg.getWReg(); 
+		int buf;
+		buf = w + k;
+		setCFlag(buf);
+		setZFlag(buf);
+		buf = valbigger255(buf);
+		ParDecInt.reg.increasePC();
+	}	
 	
 	public void addWF(int f, int d){
 		f= getIndirectAdress(f);
@@ -58,6 +67,40 @@ public class PicCPU {
 		ParDecInt.reg.increasePC();
 	}
 	
+	public void decF(int f, int d){
+		f = getIndirectAdress(f);
+		int buf;
+		if(ParDecInt.reg.getBank()==0){
+			buf = ParDecInt.reg.getRegister0(f) - 1;
+		}else{
+			buf = ParDecInt.reg.getRegister1(f) - 1;
+		}
+		setZFlag(buf);
+		checkDandInsert(buf,f,d);
+		ParDecInt.reg.increasePC();
+	}
+	
+	public void incF(int f, int d){
+    	f = getIndirectAdress(f);
+    	int buf;
+    	if(ParDecInt.reg.getBank()==0){
+			buf = ParDecInt.reg.getRegister0(f) + 1;
+		}else{
+			buf = ParDecInt.reg.getRegister1(f) + 1;
+		}
+    	setZFlag(buf);
+    	buf = valbigger255(buf);
+    	checkDandInsert(buf,f,d);
+		ParDecInt.reg.increasePC();
+    }
+	
+    public void nop() {
+    	ParDecInt.reg.increasePC();
+    }
+    
+   
+    
+    
 	/**Prüft ob f gesetzt ist. Wenn nein, wird 
 	 * der Inhalt im FSR übergeben
 	 */
