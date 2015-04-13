@@ -13,12 +13,7 @@ public class PicCPU {
 	public void addWF(int f, int d){
 		f= getIndirectAdress(f);
 		int w = ParDecInt.reg.getWReg(); 
-		int buf;
-		if(ParDecInt.reg.getBank()==0){
-			buf = ParDecInt.reg.getRegister0(f) + w;
-		}else{
-			buf = ParDecInt.reg.getRegister1(f) + w;
-		}
+		int buf = getValFromBank(f)+w;
 		setCFlag(buf);
 		setZFlag(buf);
 		buf = valbigger255(buf);
@@ -29,12 +24,7 @@ public class PicCPU {
 	public void andWF(int f, int d){
 		f = getIndirectAdress(f);
 		int w = ParDecInt.reg.getWReg();
-		int buf;
-		if(ParDecInt.reg.getBank()==0){
-			buf = ParDecInt.reg.getRegister0(f) & w;
-		}else{
-			buf = ParDecInt.reg.getRegister1(f) & w;
-		}
+		int buf = getValFromBank(f)&w;
 		buf = valbigger255(buf);
 		setZFlag(buf);
 		checkDandInsert(buf,f,d);
@@ -56,12 +46,7 @@ public class PicCPU {
 	
 	public void comF(int f, int d){
 		f = getIndirectAdress(f);
-		int buf;
-		if(ParDecInt.reg.getBank()==0){
-			buf = ParDecInt.reg.getRegister0(f)^255;
-		}else{
-			buf = ParDecInt.reg.getRegister1(f)^255;
-		}
+		int buf =getValFromBank(f)^255;
 		setZFlag(buf);
 		checkDandInsert(buf, f, d);
 		ParDecInt.reg.increasePC();
@@ -69,12 +54,7 @@ public class PicCPU {
 	
 	public void decF(int f, int d){
 		f = getIndirectAdress(f);
-		int buf;
-		if(ParDecInt.reg.getBank()==0){
-			buf = ParDecInt.reg.getRegister0(f) - 1;
-		}else{
-			buf = ParDecInt.reg.getRegister1(f) - 1;
-		}
+		int buf = getValFromBank(f)-1;
 		setZFlag(buf);
 		checkDandInsert(buf,f,d);
 		ParDecInt.reg.increasePC();
@@ -82,12 +62,7 @@ public class PicCPU {
 
 	public void decFSZ(int f, int d){
 		f= getIndirectAdress(f);
-		int buf;
-		if(ParDecInt.reg.getBank()==0){
-			buf = ParDecInt.reg.getRegister0(f) - 1;
-		}else{
-			buf = ParDecInt.reg.getRegister1(f) - 1;
-		}
+		int buf = getValFromBank(f)-1;
 		setZFlag(buf);
 		checkDandInsert(buf,f,d);
 		if(buf==0){
@@ -98,12 +73,7 @@ public class PicCPU {
 	
 	public void incF(int f, int d){
     	f = getIndirectAdress(f);
-    	int buf;
-    	if(ParDecInt.reg.getBank()==0){
-			buf = ParDecInt.reg.getRegister0(f) + 1;
-		}else{
-			buf = ParDecInt.reg.getRegister1(f) + 1;
-		}
+    	int buf = getValFromBank(f)+1;
     	setZFlag(buf);
     	buf = valbigger255(buf);
     	checkDandInsert(buf,f,d);
@@ -112,12 +82,7 @@ public class PicCPU {
 	
 	public void incFSZ(int f, int d){
     	f = getIndirectAdress(f);
-    	int buf;
-    	if(ParDecInt.reg.getBank()==0){
-			buf = ParDecInt.reg.getRegister0(f) + 1;
-		}else{
-			buf = ParDecInt.reg.getRegister1(f) + 1;
-		}
+    	int buf = getValFromBank(f)+1;
     	setZFlag(buf);
     	buf = valbigger255(buf);
     	checkDandInsert(buf,f,d);
@@ -132,10 +97,16 @@ public class PicCPU {
     }
     
    
+    public int getValFromBank(int f){
+    	if(ParDecInt.reg.getBank()==0){
+    		return ParDecInt.reg.getRegister0(f);
+    	}else{
+			return ParDecInt.reg.getRegister1(f);
+		}
+    }
     
-    
-	/**PrÃ¼ft ob f gesetzt ist. Wenn nein, wird 
-	 * der Inhalt im FSR Ã¼bergeben
+	/**Prüft ob f gesetzt ist. Wenn nein, wird 
+	 * der Inhalt im FSR übergeben
 	 */
 	public int getIndirectAdress(int f){
 		if(f==0){
