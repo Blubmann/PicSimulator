@@ -92,6 +92,14 @@ public class PicCPU {
 		ParDecInt.reg.increasePC();
     }
 	
+	public void movF(int f, int d){
+		f= getIndirectAdress(f); 
+		int buf = getValFromBank(f);
+		setZFlag(buf);
+		checkDandInsert(buf,f,d);
+		ParDecInt.reg.increasePC();
+	}
+	
     public void nop() {
     	ParDecInt.reg.increasePC();
     }
