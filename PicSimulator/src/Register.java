@@ -136,4 +136,12 @@ public class Register {
 		bank1[pcl]=pc;
 		System.out.println("PCL erhöht");
 	}
+	
+	/**Hält die Registerzellen fsr, status, pclath udn intcon synchron**/
+	public void synchronizeBothBanks(int f, int val) {
+        if (f == fsr || f == status || f == pclath || f == intcon) {
+            bank0[f] = val;
+            bank1[f] = val;
+        }
+    }
 }

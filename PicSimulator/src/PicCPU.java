@@ -3,7 +3,7 @@ public class PicCPU {
 	
 	public void addWF(int f, int d){
 		f= getIndirectAdress(f);
-		int w = ParDecInt.reg.getWReg();
+		int w = ParDecInt.reg.getWReg(); 
 		int buf;
 		if(ParDecInt.reg.getBank()==0){
 			buf = ParDecInt.reg.getRegister0(f) + w;
@@ -12,13 +12,37 @@ public class PicCPU {
 		}
 		setCFlag(buf);
 		setZFlag(buf);
+		buf = valbigger255(buf);
 		checkDandInsert(buf,f,d);
 		ParDecInt.reg.increasePC();
 	}
 	
-	public void addLW(int k){
+	public void andWF(int f, int d){
+		f = getIndirectAdress(f);
 		int w = ParDecInt.reg.getWReg();
-		int buf = w+k;
+		int buf;
+		if(ParDecInt.reg.getBank()==0){
+			buf = ParDecInt.reg.getRegister0(f) & w;
+		}else{
+			buf = ParDecInt.reg.getRegister1(f) & w;
+		}
+		buf = valbigger255(buf);
+		setZFlag(buf);
+		checkDandInsert(buf,f,d);
+		ParDecInt.reg.increasePC();
+	}
+	
+	public void clrF(int f){
+		f = getIndirectAdress(f);
+		setZFlag(0);
+		checkDandInsert(0, f, 1);
+		ParDecInt.reg.increasePC();
+	}
+	
+	public void clrW(){
+		setZFlag(0);
+		ParDecInt.reg.setWReg(0);
+		ParDecInt.reg.increasePC();
 	}
 	
 	/**Prüft ob f gesetzt ist. Wenn nein, wird 
@@ -55,32 +79,28 @@ public class PicCPU {
 		}
 	}
 	
+	private int valbigger255(int val){
+		if(val>255){
+			return (val-255);
+		}else{
+			return val;
+		}
+	}
+	
 	/**Prüft ob d gesetzt, um zu entscheiden ob in W 
 	 * oder ins Register geschrieben wird. Bei Zahlen > 255
 	 * wird entsprechend subtrahiert 
 	 */
-	public void checkDandInsert(int buf, int f, int d){
+	private void checkDandInsert(int buf, int f, int d){
 			if(d==0){
-				if(buf > 255){
-					buf = buf-255;
 					ParDecInt.reg.setWReg(buf);
-				}else{
-					ParDecInt.reg.setWReg(buf);
-				}
 			}else{
-				if(buf > 255){
-					buf = buf -255;
-					if(ParDecInt.reg.getBank()==0){
-						ParDecInt.reg.setRegister0(f, buf);
-					} else{
-						ParDecInt.reg.setRegister1(f, buf);
-					}
+				if(ParDecInt.reg.getBank()==0){
+					ParDecInt.reg.setRegister0(f, buf);
+					ParDecInt.reg.synchronizeBothBanks(f, buf);
 				}else{
-					if(ParDecInt.reg.getBank()==0){
-						ParDecInt.reg.setRegister0(f, buf);
-					} else{
-						ParDecInt.reg.setRegister1(f, buf);
-					}
+					ParDecInt.reg.setRegister1(f, buf);
+					ParDecInt.reg.synchronizeBothBanks(f, buf);
 				}
 			}
 	}

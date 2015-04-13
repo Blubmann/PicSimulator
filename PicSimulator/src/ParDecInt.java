@@ -9,7 +9,6 @@ public class ParDecInt extends Thread{
 	public void run(){
 		//System.out.println(instructions[0]);
 		//System.out.println("Test");
-		reg.setWReg(10);
 		for (int i = 0; i <= (instructions.length - 1); i++) {
 			decode(i);
 		}
@@ -64,10 +63,12 @@ public class ParDecInt extends Thread{
             int f = instructions[line] & 127;
             int d = instructions[line] & 128;
             System.out.println("ANDWF, f ist " + f +" d ist " + d);
+            cpu.andWF(f, d);
 		}
 		else if (instructions[line] >= 384 && instructions[line] <= 511) {
             int f = instructions[line] & 127;
             System.out.println("CLRF, f ist "+f);
+            cpu.clrF(f);
 		}
 		else if (instructions[line] >= 256 && instructions[line] <= 383) {
             System.out.println("CLRW");
