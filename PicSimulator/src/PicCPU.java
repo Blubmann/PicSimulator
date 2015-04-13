@@ -60,7 +60,6 @@ public class PicCPU {
 	
 	public void decf(int f, int d){
 		f= getIndirectAdress(f);
-		int w = ParDecInt.reg.getWReg(); 
 		int buf;
 		if(ParDecInt.reg.getBank()==0){
 			buf = ParDecInt.reg.getRegister0(f) - 1;
@@ -73,7 +72,11 @@ public class PicCPU {
 		checkDandInsert(buf,f,d);
 		ParDecInt.reg.increasePC();
 	}
-
+	
+    public void nop() {
+    	ParDecInt.reg.increasePC();
+    }
+    
 	/**Prüft ob f gesetzt ist. Wenn nein, wird 
 	 * der Inhalt im FSR übergeben
 	 */
