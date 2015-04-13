@@ -35,6 +35,7 @@ import java.util.Vector;
 
 import javax.swing.JList;
 import javax.swing.table.DefaultTableModel;
+import javax.swing.JLayeredPane;
 
 
 public class MainGUI extends JFrame{
@@ -42,8 +43,10 @@ public class MainGUI extends JFrame{
 	private JPanel contentPane;
 	private JButton btnStart;
 	public ParDecInt pardecint;
+	private CodeTable codetab;
 	private RegTable regtab;
 	private JScrollPane scrollPane = new JScrollPane();
+	private JScrollPane scrollPane_1 = new JScrollPane();
 	private Boolean checkbox;
 
 	/**
@@ -104,9 +107,23 @@ public class MainGUI extends JFrame{
 		});
 		btnStart.setBounds(10, 11, 89, 23);
 		contentPane.add(btnStart);		
+		
+		
 		scrollPane.setBounds(358, 15, 698, 465);
 		contentPane.add(scrollPane);		
-		regtab = new RegTable(scrollPane);
+		codetab = new CodeTable(scrollPane);
+		
+		scrollPane_1.setBounds(22, 95, 310, 385);
+		contentPane.add(scrollPane_1);
+		regtab = new RegTable(scrollPane_1);
+		
+		JButton btnBank = new JButton("Bank0");
+		btnBank.setBounds(22, 71, 89, 23);
+		contentPane.add(btnBank);
+		
+		JButton button = new JButton("Bank1");
+		button.setBounds(110, 71, 89, 23);
+		contentPane.add(button);
 		
 	}	
 	
@@ -124,7 +141,7 @@ public class MainGUI extends JFrame{
 		if (rVal == JFileChooser.APPROVE_OPTION) {
 			/**Ausgewählte Datei wird gespeichert, die Codetabelle auf der GUI wird gelöscht, die Datei wird weitergereicht**/
             file = open.getSelectedFile();
-            regtab.removeAll();
+            codetab.removeAll();
             readandwrite(file);
         }else if(rVal==JFileChooser.CANCEL_OPTION){
         	System.out.println("JFileChooser canceled");
@@ -178,7 +195,7 @@ public class MainGUI extends JFrame{
 				list.setListData(vector);**/
 	        	//System.out.println(tableData);
 	        }
-	        regtab.setTable(scrollPane, tableData);
+	        codetab.setTable(scrollPane, tableData);
 	        pardecint = new ParDecInt(Buffer);
 	        br.close();
 			countbr.close();
