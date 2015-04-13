@@ -55,7 +55,16 @@ public class PicCPU {
 	}
 	
 	public void comF(int f, int d){
-		
+		f = getIndirectAdress(f);
+		int buf;
+		if(ParDecInt.reg.getBank()==0){
+			buf = ParDecInt.reg.getRegister0(f)^255;
+		}else{
+			buf = ParDecInt.reg.getRegister1(f)^255;
+		}
+		setZFlag(buf);
+		checkDandInsert(buf, f, d);
+		ParDecInt.reg.increasePC();
 	}
 	
 	public void decf(int f, int d){
