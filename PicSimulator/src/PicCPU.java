@@ -67,7 +67,7 @@ public class PicCPU {
 		ParDecInt.reg.increasePC();
 	}
 	
-	public void decf(int f, int d){
+	public void decF(int f, int d){
 		f= getIndirectAdress(f);
 		int buf;
 		if(ParDecInt.reg.getBank()==0){
@@ -80,7 +80,7 @@ public class PicCPU {
 		checkDandInsert(buf,f,d);
 		ParDecInt.reg.increasePC();
 	}
-	public void decfsz(int f, int d){
+	public void decFSZ(int f, int d){
 		f= getIndirectAdress(f);
 		int buf;
 		if(ParDecInt.reg.getBank()==0){
