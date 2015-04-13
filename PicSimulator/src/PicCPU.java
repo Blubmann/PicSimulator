@@ -9,6 +9,22 @@ public class PicCPU {
 		buf = valbigger255(buf);
 		ParDecInt.reg.increasePC();
 	}	
+
+	public void decf(int f, int d){
+		f= getIndirectAdress(f);
+		int w = ParDecInt.reg.getWReg(); 
+		int buf;
+		if(ParDecInt.reg.getBank()==0){
+			buf = ParDecInt.reg.getRegister0(f) - 1;
+		}else{
+			buf = ParDecInt.reg.getRegister1(f) - 1;
+		}
+		setCFlag(buf);
+		setZFlag(buf);
+		buf = valbigger255(buf);
+		checkDandInsert(buf,f,d);
+		ParDecInt.reg.increasePC();
+	}
 	
 	public void addWF(int f, int d){
 		f= getIndirectAdress(f);
