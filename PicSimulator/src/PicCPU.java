@@ -1,5 +1,14 @@
 public class PicCPU {
 	
+	public void addLW(int k){
+		int w = ParDecInt.reg.getWReg(); 
+		int buf;
+		buf = w + k;
+		setCFlag(buf);
+		setZFlag(buf);
+		buf = valbigger255(buf);
+		ParDecInt.reg.increasePC();
+	}	
 	
 	public void addWF(int f, int d){
 		f= getIndirectAdress(f);
