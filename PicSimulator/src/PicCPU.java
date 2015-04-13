@@ -96,6 +96,22 @@ public class PicCPU {
 		ParDecInt.reg.increasePC();
 	}
 	
+		public void decFSZ(int f, int d){
+		f= getIndirectAdress(f);
+		int buf;
+		if(ParDecInt.reg.getBank()==0){
+			buf = ParDecInt.reg.getRegister0(f) - 1;
+		}else{
+			buf = ParDecInt.reg.getRegister1(f) - 1;
+		}
+		setZFlag(buf);
+		checkDandInsert(buf,f,d);
+		if(buf==0){
+			nop();
+		}
+		ParDecInt.reg.increasePC();
+	}
+	
 	public void incF(int f, int d){
     	f = getIndirectAdress(f);
     	int buf;
@@ -117,8 +133,8 @@ public class PicCPU {
    
     
     
-	/**Prüft ob f gesetzt ist. Wenn nein, wird 
-	 * der Inhalt im FSR übergeben
+	/**PrÃ¼ft ob f gesetzt ist. Wenn nein, wird 
+	 * der Inhalt im FSR Ã¼bergeben
 	 */
 	public int getIndirectAdress(int f){
 		if(f==0){
@@ -159,7 +175,7 @@ public class PicCPU {
 		}
 	}
 	
-	/**Prüft ob d gesetzt, um zu entscheiden ob in W 
+	/**PrÃ¼ft ob d gesetzt, um zu entscheiden ob in W 
 	 * oder ins Register geschrieben wird. Bei Zahlen > 255
 	 * wird entsprechend subtrahiert 
 	 */
