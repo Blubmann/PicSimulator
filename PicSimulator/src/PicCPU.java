@@ -45,6 +45,10 @@ public class PicCPU {
 		ParDecInt.reg.increasePC();
 	}
 	
+	public void comF(int f, int d){
+		
+	}
+	
 	/**Prüft ob f gesetzt ist. Wenn nein, wird 
 	 * der Inhalt im FSR übergeben
 	 */
