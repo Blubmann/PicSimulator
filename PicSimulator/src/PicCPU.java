@@ -1,5 +1,9 @@
 public class PicCPU {
 	
+    /*----------------------------------------
+     * BYTE-ORIENTED FILE REGISTER OPERATIONS
+     *----------------------------------------*/
+	
 	public void addLW(int k){
 		int w = ParDecInt.reg.getWReg(); 
 		int buf;
@@ -9,32 +13,11 @@ public class PicCPU {
 		buf = valbigger255(buf);
 		ParDecInt.reg.increasePC();
 	}	
-
-	public void decf(int f, int d){
-		f= getIndirectAdress(f);
-		int w = ParDecInt.reg.getWReg(); 
-		int buf;
-		if(ParDecInt.reg.getBank()==0){
-			buf = ParDecInt.reg.getRegister0(f) - 1;
-		}else{
-			buf = ParDecInt.reg.getRegister1(f) - 1;
-		}
-		setCFlag(buf);
-		setZFlag(buf);
-		buf = valbigger255(buf);
-		checkDandInsert(buf,f,d);
-		ParDecInt.reg.increasePC();
-	}
 	
 	public void addWF(int f, int d){
 		f= getIndirectAdress(f);
 		int w = ParDecInt.reg.getWReg(); 
-		int buf;
-		if(ParDecInt.reg.getBank()==0){
-			buf = ParDecInt.reg.getRegister0(f) + w;
-		}else{
-			buf = ParDecInt.reg.getRegister1(f) + w;
-		}
+		int buf = getValFromBank(f)+w;
 		setCFlag(buf);
 		setZFlag(buf);
 		buf = valbigger255(buf);
@@ -45,12 +28,7 @@ public class PicCPU {
 	public void andWF(int f, int d){
 		f = getIndirectAdress(f);
 		int w = ParDecInt.reg.getWReg();
-		int buf;
-		if(ParDecInt.reg.getBank()==0){
-			buf = ParDecInt.reg.getRegister0(f) & w;
-		}else{
-			buf = ParDecInt.reg.getRegister1(f) & w;
-		}
+		int buf = getValFromBank(f)&w;
 		buf = valbigger255(buf);
 		setZFlag(buf);
 		checkDandInsert(buf,f,d);
@@ -71,9 +49,146 @@ public class PicCPU {
 	}
 	
 	public void comF(int f, int d){
-		
+		f = getIndirectAdress(f);
+		int buf =getValFromBank(f)^255;
+		setZFlag(buf);
+		checkDandInsert(buf, f, d);
+		ParDecInt.reg.increasePC();
 	}
 	
+	public void decF(int f, int d){
+		f = getIndirectAdress(f);
+		int buf = getValFromBank(f)-1;
+		setZFlag(buf);
+		checkDandInsert(buf,f,d);
+		ParDecInt.reg.increasePC();
+	}
+
+	public void decFSZ(int f, int d){
+		f= getIndirectAdress(f);
+		int buf = getValFromBank(f)-1;
+		setZFlag(buf);
+		checkDandInsert(buf,f,d);
+		if(buf==0){
+			nop();
+		}
+		ParDecInt.reg.increasePC();
+	}
+	
+	public void incF(int f, int d){
+    	f = getIndirectAdress(f);
+    	int buf = getValFromBank(f)+1;
+    	setZFlag(buf);
+    	buf = valbigger255(buf);
+    	checkDandInsert(buf,f,d);
+		ParDecInt.reg.increasePC();
+    }
+	
+	public void incFSZ(int f, int d){
+    	f = getIndirectAdress(f);
+    	int buf = getValFromBank(f)+1;
+    	setZFlag(buf);
+    	buf = valbigger255(buf);
+    	checkDandInsert(buf,f,d);
+		if(buf==0){
+			nop();
+		}
+		ParDecInt.reg.increasePC();
+    }
+	
+	public void movF(int f, int d){
+		f= getIndirectAdress(f); 
+		int buf = getValFromBank(f);
+		setZFlag(buf);
+		checkDandInsert(buf,f,d);
+		ParDecInt.reg.increasePC();
+	}
+	
+	public void moveWF(int f){
+		f = getIndirectAdress(f);
+		int w = ParDecInt.reg.getWReg();
+		checkDandInsert(w, f, 1);
+		ParDecInt.reg.increasePC();
+	}
+	
+    public void nop() {
+    	ParDecInt.reg.increasePC();
+    }
+    
+    public void rlf(int f, int d) {
+    	ParDecInt.reg.increasePC();
+    }
+
+    public void rrf(int f, int d) {
+    	ParDecInt.reg.increasePC();
+    }
+    
+    public void subWF(int f, int d) {
+    	ParDecInt.reg.increasePC();
+    }
+    
+    public void swapF(int f, int d) {
+    	ParDecInt.reg.increasePC();
+    }
+    
+    public void xorWF(int f, int d) {
+    	ParDecInt.reg.increasePC();
+    }
+    
+    /*---------------------------------------
+     * BIT-ORIENTED FILE REGISTER OPERATIONS
+     *---------------------------------------*/
+    
+    public void bcf(int f, int b) {
+		f= getIndirectAdress(f); 
+		int buf = getValFromBank(f);
+		buf = buf  & ~(1 << b);
+    	checkDandInsert(buf,f,1);
+    	ParDecInt.reg.increasePC();
+    }    
+    
+    public void bsf(int f, int b) {
+		f= getIndirectAdress(f); 
+		int buf = getValFromBank(f);
+		buf = buf  | (1 << b);
+    	checkDandInsert(buf,f,1);
+    	ParDecInt.reg.increasePC();
+    }   
+ 
+    public void btfsc(int f, int b) {
+		f= getIndirectAdress(f); 
+		int buf = getValFromBank(f);
+		if  ((buf & (1 << b))==0){
+			nop();
+		}
+    	ParDecInt.reg.increasePC();
+    }    
+
+    public void btfss(int f, int b) {
+		f= getIndirectAdress(f); 
+		int buf = getValFromBank(f);
+		if  ((buf & (1 << b))!=0){
+			nop();
+		}
+    	ParDecInt.reg.increasePC();
+    }    
+ 
+    /*---------------------------------------
+     * LITERAL AND FILE REGISTER OPERATIONS
+     *---------------------------------------*/
+    
+    
+    /*---------------------------------------
+     * anderer K‰se
+     *---------------------------------------*/
+    public int getValFromBank(int f){
+    	if(ParDecInt.reg.getBank()==0){
+    		return ParDecInt.reg.getRegister0(f);
+    	}else{
+			return ParDecInt.reg.getRegister1(f);
+		}
+    }
+    
 	/**Pr¸ft ob f gesetzt ist. Wenn nein, wird 
 	 * der Inhalt im FSR ¸bergeben
 	 */
@@ -116,9 +231,8 @@ public class PicCPU {
 		}
 	}
 	
-	/**Pr¸ft ob d gesetzt, um zu entscheiden ob in W 
-	 * oder ins Register geschrieben wird. Bei Zahlen > 255
-	 * wird entsprechend subtrahiert 
+	/**Pr√ºft ob d gesetzt, um zu entscheiden ob in W 
+	 * oder ins Register geschrieben wird. 
 	 */
 	private void checkDandInsert(int buf, int f, int d){
 			if(d==0){

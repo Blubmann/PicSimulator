@@ -1,66 +1,87 @@
 import java.util.Vector;
+
 import javax.swing.DefaultCellEditor;
-import javax.swing.JCheckBox;
-import javax.swing.JFrame;
 import javax.swing.JScrollPane;
 import javax.swing.JTable;
-import javax.swing.table.AbstractTableModel;
 import javax.swing.table.DefaultTableModel;
- 
-public class RegTable extends JTable{
-	JCheckBox checkBox = new javax.swing.JCheckBox(); 
-	
-	/**Initialisiert die Tabelle beim Starten des Programms**/
-	public RegTable(JScrollPane scrollPane){
-		Vector title = new Vector();
-		title.add( "BP" );
-		title.add( "Code" );
-		JTable table = new JTable();
-		scrollPane.setViewportView(table);
-		table.setModel(new DefaultTableModel(null,title) {
-			
-			boolean[] columnEditables = new boolean[] {
-				true, false
-			};
-			public boolean isCellEditable(int row, int column) {
-				return columnEditables[column];
-			}
-		});
-		table.getColumnModel().getColumn(0).setPreferredWidth(23);
-		table.getColumnModel().getColumn(0).setMaxWidth(25);
-		table.getColumnModel().getColumn(1).setResizable(false);
-		table.getColumnModel().getColumn(1).setPreferredWidth(475);
-	}
-	
-	/**Setzt den Inhalt der Tabelle nach dem öffnen eines lst-Files**/
-	public void setTable(JScrollPane scrollPane, Vector vec){
-		Vector title = new Vector();
-		title.add( "BP" );
-		title.add( "Code" );
-		//System.out.println(vec);
-		JTable table = new JTable();
-		table.setModel(new DefaultTableModel(vec,title) {
-			
-			boolean[] columnEditables = new boolean[] {
-				true, false
-			};
-			public boolean isCellEditable(int row, int column) {
-				return columnEditables[column];
-				
-			}
-			Class[] types = new Class [] {
-			        java.lang.Boolean.class, java.lang.Object.class
-			    };
 
-			public Class getColumnClass(int columnIndex) {
-			       return types [columnIndex];
-			} 
-		});
-		table.getColumnModel().getColumn(0).setPreferredWidth(23);
-		table.getColumnModel().getColumn(0).setMaxWidth(25);
-		table.getColumnModel().getColumn(1).setResizable(false);
-		table.getColumnModel().getColumn(1).setPreferredWidth(475);
-		table.getColumn("BP").setCellEditor(new DefaultCellEditor(checkBox)); 
+public class RegTable extends JTable {
+	private String[][] bank0 = new String[128][2];
+    private String[] titel = new String[2];
+    private DefaultTableModel dm0;
+	public RegTable(JScrollPane scrollPane){
+		JTable table = new JTable();
 		scrollPane.setViewportView(table);
+		table.setModel(new javax.swing.table.DefaultTableModel(
+	            new Object [][] {
+	                {null, null},
+	                {null, null},
+	                {null, null},
+	                {null, null},
+	                {null, null},
+	                {null, null},
+	                {null, null},
+	                {null, null},
+	                {null, null},
+	                {null, null},
+	                {null, null},
+	                {null, null},
+	                {null, null},
+	                {null, null},
+	                {null, null},
+	                {null, null},
+	                {null, null},
+	                {null, null},
+	                {null, null},
+	                {null, null},
+	                {null, null},
+	                {null, null},
+	                {null, null},
+	                {null, null},
+	                {null, null},
+	                {null, null},
+	                {null, null},
+	                {null, null},
+	                {null, null},
+	                {null, null},
+	                {null, null},
+	                {null, null},
+	                {null, null},
+	                {null, null},
+	                {null, null},
+	                {null, null},
+	                {null, null}
+	            },
+	            new String [] {
+	                "Adresse", "Value"
+	            }
+	        ) {
+	            Class[] types = new Class [] {
+	                java.lang.String.class, java.lang.Integer.class
+	            };
+	            boolean[] canEdit = new boolean [] {
+	                false, false
+	            };
+
+	            public Class getColumnClass(int columnIndex) {
+	                return types [columnIndex];
+	            }
+
+	            public boolean isCellEditable(int rowIndex, int columnIndex) {
+	                return canEdit [columnIndex];
+	            }
+	        });
+		dm0 = new DefaultTableModel(bank0, titel);
+        for (int i = 0; i < 128; i++) {
+            if (i != 1 && i != 2 && i != 3 && i != 4 && i != 5 && i != 6 && i != 8 && i != 9 && i != 10 && i != 11) {
+                dm0.setValueAt("Register " + i, i, 0);
+            }
+            dm0.setValueAt(ParDecInt.reg.bank0[i], i, 1);
+        }
+        table.setModel(dm0);
+        table.getColumnModel().getColumn(0).setPreferredWidth(100);
+		table.getColumnModel().getColumn(0).setMaxWidth(250);
+		table.getColumnModel().getColumn(1).setResizable(false);
+		table.getColumnModel().getColumn(1).setPreferredWidth(100);
 	}
 }
