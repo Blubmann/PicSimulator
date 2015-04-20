@@ -86,6 +86,10 @@ public class PicCPU {
 		ParDecInt.reg.increasePC();
     }
 	
+	public void iorWF(int f, int d){
+		//TODO
+	}
+	
 	public void movF(int f, int d){
 		f= getIndirectAdress(f); 
 		int buf = getValFromBank(f);
@@ -106,22 +110,27 @@ public class PicCPU {
     }
     
     public void rlf(int f, int d) {
+    	//TODO
     	ParDecInt.reg.increasePC();
     }
 
     public void rrf(int f, int d) {
+    	//TODO
     	ParDecInt.reg.increasePC();
     }
     
     public void subWF(int f, int d) {
+    	//TODO
     	ParDecInt.reg.increasePC();
     }
     
     public void swapF(int f, int d) {
+    	//TODO
     	ParDecInt.reg.increasePC();
     }
     
     public void xorWF(int f, int d) {
+    	//TODO
     	ParDecInt.reg.increasePC();
     }
     
@@ -189,6 +198,50 @@ public class PicCPU {
 		ParDecInt.reg.increasePC();
 	}
 	
+	public void call(int k){
+		ParDecInt.reg.pushPCtoStack();
+		ParDecInt.reg.setPC(k);
+	}
+	
+	public void clrwdt(){
+		//TODO
+	}
+	
+	public void instGoto(int k){
+		ParDecInt.reg.setPC(k);
+	}
+	
+	public void iorLW(int k){
+		//TODO
+	}
+	
+	public void movLW(int k){
+		//TODO
+	}
+	
+	public void retfie(){
+		//TODO
+	}
+	
+	public void retLW(int k){
+		//TODO
+	}
+	
+	public void instReturn(){
+		//TODO
+	}
+	
+	public void sleep(){
+		//TODO
+	}
+	
+	public void subLW(int k){
+		//TODO
+	}
+	
+	public void xorLW(int k){
+		//TODO
+	}
 	
 	
     /*---------------------------------------

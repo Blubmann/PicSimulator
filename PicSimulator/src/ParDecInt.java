@@ -3,28 +3,29 @@ public class ParDecInt extends Thread{
 	public String[] code;
 	public static int[] instructions;
 	private Thread t;
+	private int i=0;
 	private static PicCPU cpu = new PicCPU();
 	public static Register reg = new Register();
 	
 	public void run(){
-		int i=0;
 		//System.out.println(instructions[0]);
 		//System.out.println("Test");
 		if(MainGUI.run==true){
 			for (i = 0; i <= (instructions.length - 1); i++) {
+				i=reg.getPC();
 				decode(i);
 			}
+			MainGUI.run=false;
 		}
-		
-		if(MainGUI.step=true){
-			MainGUI.step=false;
-			if(i<=(instructions.length-1)){
+		i=reg.getPC();
+		if(MainGUI.step=true && i<=(instructions.length-1)){
+				System.out.println("I: " +i);
 				decode(i);
-				i++;
-			}
+				System.out.println("PCL: "+reg.getPC());
+				MainGUI.step=false;
 		}
 		//reg.printRegister();
-		//System.out.println("PCL: "+reg.getPC());
+		
 	}
 	
     public void start (){
@@ -56,7 +57,6 @@ public class ParDecInt extends Thread{
 			CodeCount++;
 		}
 		instructions=newInst;
-		//System.out.println(instructions[0]);
 	}
 	
 	/**Die Methode bekommt beim Drücken der Starttaste den extrahierten Opcode übergeben und 
@@ -186,13 +186,17 @@ public class ParDecInt extends Thread{
 		else if (instructions[line] >= 8192 && instructions[line] <= 10239) {
             int k = instructions[line] & 255;
             System.out.println("CALL, k ist " + k);
+            cpu.call(k);
+            System.out.println(ParDecInt.reg.getPC());
 		}
 		else if (instructions[line] == 100) {
             System.out.println("CLRWDT");
 		}
-		else if (instructions[line] >= 14592 && instructions[line] <= 14847) {
+		else if (instructions[line] >= 10240 && instructions[line] <= 12287) {
             int k = instructions[line] & 2047;
             System.out.println("GOTO, k ist " + k);
+            cpu.instGoto(k);
+            System.out.println(ParDecInt.reg.getPC());
 		}
 		else if (instructions[line] >= 14336 && instructions[line] <= 14591) {
             int k = instructions[line] & 255;

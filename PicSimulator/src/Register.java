@@ -148,11 +148,22 @@ public class Register {
 		System.out.println("PCL erhöht");
 	}
 	
-	/**Hält die Registerzellen fsr, status, pclath udn intcon synchron**/
+	/**Hält die Registerzellen fsr, status, pclath und intcon synchron**/
 	public void synchronizeBothBanks(int f, int val) {
         if (f == fsr || f == status || f == pclath || f == intcon) {
             bank0[f] = val;
             bank1[f] = val;
         }
     }
+	
+	public void setPC(int actualPC){
+		int pcLath = bank0[pclath];
+		pcLath = (Integer.rotateRight(pcLath, 3)) & 0b11;
+		pcLath = Integer.rotateLeft(pcLath, 11);
+		pc= pcLath | actualPC;
+		int pcl = pc & 0b11111111;
+		int newPclath = (Integer.rotateRight(pc, 8)) & 0b11111;
+		synchronizeBothBanks(pcl, pcl);
+		synchronizeBothBanks(pclath, newPclath);
+	}
 }
