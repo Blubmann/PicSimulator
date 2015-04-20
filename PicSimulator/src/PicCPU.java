@@ -147,7 +147,12 @@ public class PicCPU {
     }
     
     public void xorWF(int f, int d) {
-    	//TODO
+    	f= getIndirectAdress(f); 
+		int buf = getValFromBank(f);
+		int w = ParDecInt.reg.getWReg();
+		buf = buf ^ w;
+		setZFlag(buf);
+        checkDandInsert(buf, f, d);
     	ParDecInt.reg.increasePC();
     }
     
@@ -260,7 +265,11 @@ public class PicCPU {
 	}
 	
 	public void xorLW(int k){
-		//TODO
+		int w = ParDecInt.reg.getWReg();
+		int buf = k ^ w;
+		setZFlag(buf);
+        checkDandInsert(buf, 0, 0);
+    	ParDecInt.reg.increasePC();
 	}
 	
 	
