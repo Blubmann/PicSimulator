@@ -87,7 +87,12 @@ public class PicCPU {
     }
 	
 	public void iorWF(int f, int d){
-		//TODO
+		f= getIndirectAdress(f);
+		int w = ParDecInt.reg.getWReg();
+		int buf = getValFromBank(f)|w;
+		setZFlag(buf);
+		checkDandInsert(buf,f,d);
+		ParDecInt.reg.increasePC();
 	}
 	
 	public void movF(int f, int d){
