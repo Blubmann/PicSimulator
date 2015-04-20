@@ -79,6 +79,10 @@ public class Register {
 		statusReg[pos]=val;
 	}
 	
+	public int getStatusReg(int pos){
+		return statusReg[pos];
+	}
+	
 	/**Inhalt einer Zelle auf Bank0 setzen**/
 	public void setRegister0(int f, int result){
 		bank0[f]= result;
