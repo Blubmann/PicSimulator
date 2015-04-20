@@ -87,7 +87,12 @@ public class PicCPU {
     }
 	
 	public void iorWF(int f, int d){
-		//TODO
+		f= getIndirectAdress(f);
+		int w = ParDecInt.reg.getWReg();
+		int buf = getValFromBank(f)|w;
+		setZFlag(buf);
+		checkDandInsert(buf,f,d);
+		ParDecInt.reg.increasePC();
 	}
 	
 	public void movF(int f, int d){
@@ -110,7 +115,16 @@ public class PicCPU {
     }
     
     public void rlf(int f, int d) {
-    	//TODO
+    	f = getIndirectAdress(f);
+    	int msb = getValFromBank(f)&128;
+    	int buf = getValFromBank(f)<<1;
+    	if(msb==128){
+    		msb=1;
+    	}
+    	if(ParDecInt.reg.getStatusReg(ParDecInt.reg.cFlag)!=0){
+    		buf = buf +1;
+    	}
+    	ParDecInt.reg.setStatusReg(ParDecInt.reg.cFlag, msb);
     	ParDecInt.reg.increasePC();
     }
 
