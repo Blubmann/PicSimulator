@@ -1,8 +1,10 @@
+import java.util.Stack;
 import java.util.Vector;
 
 public class Register {
 	
 	private static int pc;
+	private Stack<Integer> stack = new Stack<Integer>();
 	
 	/**Häufig verwendete Adressen**/
 	public final int tmr0 = 1;
@@ -46,6 +48,13 @@ public class Register {
 		this.bank1[trisB] = 255;
 	}
 	
+	public void pushPCtoStack(){
+		stack.push(pc+1);
+	}
+	
+	public int popPCfromStack(){
+		return stack.pop();
+	}
 	/**Der Inhalt von Bank0 und Bank1 sind identisch. Wenn f=0 ist,
 	 * wird geprüft was im FSR steht. Wenn < 127 kann es so direkt 
 	 * eingesezt werden. Bei > 127 muss entweder der Inhalt 
@@ -139,11 +148,22 @@ public class Register {
 		System.out.println("PCL erhöht");
 	}
 	
-	/**Hält die Registerzellen fsr, status, pclath udn intcon synchron**/
+	/**Hält die Registerzellen fsr, status, pclath und intcon synchron**/
 	public void synchronizeBothBanks(int f, int val) {
         if (f == fsr || f == status || f == pclath || f == intcon) {
             bank0[f] = val;
             bank1[f] = val;
         }
     }
+	
+	public void setPC(int actualPC){
+		int pcLath = bank0[pclath];
+		pcLath = (Integer.rotateRight(pcLath, 3)) & 0b11;
+		pcLath = Integer.rotateLeft(pcLath, 11);
+		pc= pcLath | actualPC;
+		int pcl = pc & 0b11111111;
+		int newPclath = (Integer.rotateRight(pc, 8)) & 0b11111;
+		synchronizeBothBanks(pcl, pcl);
+		synchronizeBothBanks(pclath, newPclath);
+	}
 }

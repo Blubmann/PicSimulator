@@ -44,10 +44,12 @@ public class MainGUI extends JFrame{
 	private JButton btnStart;
 	public ParDecInt pardecint;
 	private CodeTable codetab;
-	private RegTable regtab;
+	public static RegTable regtab;
 	private JScrollPane scrollPane = new JScrollPane();
-	private JScrollPane scrollPane_1 = new JScrollPane();
+	public static JScrollPane scrollPane_1 = new JScrollPane();
 	private Boolean checkbox;
+	public static boolean run;
+	public static boolean step;
 
 	/**
 	 * Launch the application.
@@ -99,6 +101,8 @@ public class MainGUI extends JFrame{
 		btnStart = new JButton("Start");
 		btnStart.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent ev) {
+				run= true;
+				step =false;
 		        btnStart.setEnabled(false);
 		        ParDecInt pardecintThread = new ParDecInt();
 		        pardecintThread.start(); 
@@ -118,12 +122,34 @@ public class MainGUI extends JFrame{
 		regtab = new RegTable(scrollPane_1);
 		
 		JButton btnBank = new JButton("Bank0");
+		btnBank.addActionListener(new ActionListener() {
+			public void actionPerformed(ActionEvent arg0) {
+				regtab.updateTable0(scrollPane_1);
+			}
+		});
 		btnBank.setBounds(22, 71, 89, 23);
 		contentPane.add(btnBank);
 		
 		JButton button = new JButton("Bank1");
+		button.addActionListener(new ActionListener() {
+			public void actionPerformed(ActionEvent e) {
+				regtab.updateTable1(scrollPane_1);
+			}
+		});
 		button.setBounds(110, 71, 89, 23);
 		contentPane.add(button);
+		
+		JButton btnStepbystep = new JButton("Step-by-Step");
+		btnStepbystep.addActionListener(new ActionListener() {
+			public void actionPerformed(ActionEvent e) {
+				run= false;
+				step =true;
+				ParDecInt pardecintThread = new ParDecInt();
+		        pardecintThread.start(); 
+			}
+		});
+		btnStepbystep.setBounds(98, 11, 101, 23);
+		contentPane.add(btnStepbystep);
 		
 	}	
 	
