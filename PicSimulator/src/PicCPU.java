@@ -1,15 +1,9 @@
 public class PicCPU {
 	
-	public void addLW(int k){
-		int w = ParDecInt.reg.getWReg(); 
-		int buf;
-		buf = w + k;
-		setCFlag(buf);
-		setZFlag(buf);
-		buf = valbigger255(buf);
-		ParDecInt.reg.increasePC();
-	}	
-	
+    /*----------------------------------------
+     * BYTE-ORIENTED FILE REGISTER OPERATIONS
+     *----------------------------------------*/
+
 	public void addWF(int f, int d){
 		f= getIndirectAdress(f);
 		int w = ParDecInt.reg.getWReg(); 
@@ -92,6 +86,10 @@ public class PicCPU {
 		ParDecInt.reg.increasePC();
     }
 	
+	public void iorWF(int f, int d){
+		//TODO
+	}
+	
 	public void movF(int f, int d){
 		f= getIndirectAdress(f); 
 		int buf = getValFromBank(f);
@@ -100,11 +98,155 @@ public class PicCPU {
 		ParDecInt.reg.increasePC();
 	}
 	
+	public void moveWF(int f){
+		f = getIndirectAdress(f);
+		int w = ParDecInt.reg.getWReg();
+		checkDandInsert(w, f, 1);
+		ParDecInt.reg.increasePC();
+	}
+	
     public void nop() {
     	ParDecInt.reg.increasePC();
     }
     
-   
+    public void rlf(int f, int d) {
+    	//TODO
+    	ParDecInt.reg.increasePC();
+    }
+
+    public void rrf(int f, int d) {
+    	//TODO
+    	ParDecInt.reg.increasePC();
+    }
+    
+    public void subWF(int f, int d) {
+    	//TODO
+    	ParDecInt.reg.increasePC();
+    }
+    
+    public void swapF(int f, int d) {
+    	//TODO
+    	ParDecInt.reg.increasePC();
+    }
+    
+    public void xorWF(int f, int d) {
+    	//TODO
+    	ParDecInt.reg.increasePC();
+    }
+    
+    /*---------------------------------------
+     * BIT-ORIENTED FILE REGISTER OPERATIONS
+     *---------------------------------------*/
+    
+    public void bcf(int f, int b) {
+		f= getIndirectAdress(f); 
+		int buf = getValFromBank(f);
+		buf = buf  & ~(1 << b);
+    	checkDandInsert(buf,f,1);
+    	ParDecInt.reg.increasePC();
+    }    
+    
+    public void bsf(int f, int b) {
+		f= getIndirectAdress(f); 
+		int buf = getValFromBank(f);
+		buf = buf  | (1 << b);
+    	checkDandInsert(buf,f,1);
+    	ParDecInt.reg.increasePC();
+    }   
+ 
+    public void btfsc(int f, int b) {
+		f= getIndirectAdress(f); 
+		int buf = getValFromBank(f);
+		if  ((buf & (1 << b))==0){
+			nop();
+		}
+    	ParDecInt.reg.increasePC();
+    }    
+
+    public void btfss(int f, int b) {
+		f= getIndirectAdress(f); 
+		int buf = getValFromBank(f);
+		if  ((buf & (1 << b))!=0){
+			nop();
+		}
+    	ParDecInt.reg.increasePC();
+    }    
+ 
+    /*---------------------------------------
+     * LITERAL AND FILE REGISTER OPERATIONS
+     *---------------------------------------*/
+    
+	// DC einfügen
+	public void addLW(int k){
+		int w = ParDecInt.reg.getWReg(); 
+		int buf;
+		buf = w + k;
+		setCFlag(buf);
+		setZFlag(buf);
+		buf = valbigger255(buf);
+		checkDandInsert(buf,0,0);
+		ParDecInt.reg.increasePC();
+	}	
+	
+	
+	public void andLW (int k){
+		int w = ParDecInt.reg.getWReg();
+		int buf = k & w;
+		buf = valbigger255(buf);
+		setZFlag(buf);
+		checkDandInsert(buf,0,0);
+		ParDecInt.reg.increasePC();
+	}
+	
+	public void call(int k){
+		ParDecInt.reg.pushPCtoStack();
+		ParDecInt.reg.setPC(k);
+	}
+	
+	public void clrwdt(){
+		//TODO
+	}
+	
+	public void instGoto(int k){
+		ParDecInt.reg.setPC(k);
+	}
+	
+	public void iorLW(int k){
+		//TODO
+	}
+	
+	public void movLW(int k){
+		//TODO
+	}
+	
+	public void retfie(){
+		//TODO
+	}
+	
+	public void retLW(int k){
+		//TODO
+	}
+	
+	public void instReturn(){
+		//TODO
+	}
+	
+	public void sleep(){
+		//TODO
+	}
+	
+	public void subLW(int k){
+		//TODO
+	}
+	
+	public void xorLW(int k){
+		//TODO
+	}
+	
+	
+    /*---------------------------------------
+     * anderer Käse
+     *---------------------------------------*/
     public int getValFromBank(int f){
     	if(ParDecInt.reg.getBank()==0){
     		return ParDecInt.reg.getRegister0(f);
@@ -156,8 +298,7 @@ public class PicCPU {
 	}
 	
 	/**PrÃ¼ft ob d gesetzt, um zu entscheiden ob in W 
-	 * oder ins Register geschrieben wird. Bei Zahlen > 255
-	 * wird entsprechend subtrahiert 
+	 * oder ins Register geschrieben wird. 
 	 */
 	private void checkDandInsert(int buf, int f, int d){
 			if(d==0){
