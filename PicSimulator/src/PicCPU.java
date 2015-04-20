@@ -103,10 +103,10 @@ public class PicCPU {
 		ParDecInt.reg.increasePC();
 	}
 	
-	public void moveWF(int f){
+	public void movWF(int f){
 		f = getIndirectAdress(f);
 		int w = ParDecInt.reg.getWReg();
-		checkDandInsert(w, f, 1);
+		checkDandInsert(w, f, 0);
 		ParDecInt.reg.increasePC();
 	}
 	
@@ -234,11 +234,16 @@ public class PicCPU {
 	}
 	
 	public void iorLW(int k){
-		//TODO
+		int w = ParDecInt.reg.getWReg();
+		int buf = k|w;
+		setZFlag(buf);
+		checkDandInsert(buf,0,0);
+		ParDecInt.reg.increasePC();
 	}
 	
 	public void movLW(int k){
-		//TODO
+		checkDandInsert(k,0,0);
+		ParDecInt.reg.increasePC();
 	}
 	
 	public void retfie(){
