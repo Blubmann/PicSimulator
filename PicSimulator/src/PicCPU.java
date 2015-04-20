@@ -139,7 +139,10 @@ public class PicCPU {
     }
     
     public void swapF(int f, int d) {
-    	//TODO
+		f= getIndirectAdress(f); 
+		int buf = getValFromBank(f);
+        int buf2 = ( (buf & 0x0F)<<4 | (buf & 0xF0)>>4 );
+        checkDandInsert(buf2, f, d);
     	ParDecInt.reg.increasePC();
     }
     
