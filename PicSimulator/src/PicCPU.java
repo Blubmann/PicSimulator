@@ -181,7 +181,7 @@ public class PicCPU {
      * LITERAL AND FILE REGISTER OPERATIONS
      *---------------------------------------*/
     
-	// DC einfügen
+	// DC einfï¿½gen
 	public void addLW(int k){
 		int w = ParDecInt.reg.getWReg(); 
 		int buf;
@@ -229,13 +229,16 @@ public class PicCPU {
 	}
 	
 	public void retLW(int k){
-		//TODO
+		int buf = ParDecInt.reg.popPCfromStack(); 
+		checkDandInsert(k,0,0);	
+		ParDecInt.reg.setPC(buf);
 	}
 	
 	public void instReturn(){
-		//TODO
+		int buf = ParDecInt.reg.popPCfromStack(); 	
+		ParDecInt.reg.setPC(buf);
 	}
-	
+		
 	public void sleep(){
 		//TODO
 	}
@@ -250,7 +253,7 @@ public class PicCPU {
 	
 	
     /*---------------------------------------
-     * anderer Käse
+     * anderer Kï¿½se
      *---------------------------------------*/
     public int getValFromBank(int f){
     	if(ParDecInt.reg.getBank()==0){
@@ -260,8 +263,8 @@ public class PicCPU {
 		}
     }
     
-	/**Prüft ob f gesetzt ist. Wenn nein, wird 
-	 * der Inhalt im FSR übergeben
+	/**Prï¿½ft ob f gesetzt ist. Wenn nein, wird 
+	 * der Inhalt im FSR ï¿½bergeben
 	 */
 	public int getIndirectAdress(int f){
 		if(f==0){
