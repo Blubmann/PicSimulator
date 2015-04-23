@@ -1,3 +1,5 @@
+import java.awt.PageAttributes;
+
 public class PicCPU {
 	
     /*----------------------------------------
@@ -98,6 +100,7 @@ public class PicCPU {
 	public void movF(int f, int d){
 		f= getIndirectAdress(f); 
 		int buf = getValFromBank(f);
+		//TODO Wird das Z-Flag garantiert gesetzt?
 		setZFlag(buf);
 		checkDandInsert(buf,f,d);
 		ParDecInt.reg.increasePC();
@@ -106,7 +109,7 @@ public class PicCPU {
 	public void movWF(int f){
 		f = getIndirectAdress(f);
 		int w = ParDecInt.reg.getWReg();
-		checkDandInsert(w, f, 0);
+		checkDandInsert(w, f, 1);
 		ParDecInt.reg.increasePC();
 	}
 	
@@ -129,12 +132,28 @@ public class PicCPU {
     }
 
     public void rrf(int f, int d) {
-    	//TODO
+    	f = getIndirectAdress(f);
+    	int lsb = getValFromBank(f)&1;
+    	int buf = getValFromBank(f)>>1;
+    	if(ParDecInt.reg.getStatusReg(ParDecInt.reg.cFlag)!=0){
+    		buf = buf + 128;
+    	}
+    	ParDecInt.reg.setStatusReg(ParDecInt.reg.cFlag, lsb);
     	ParDecInt.reg.increasePC();
     }
     
     public void subWF(int f, int d) {
-    	//TODO
+    	f = getIndirectAdress(f);
+    	int buf = getValFromBank(f)-ParDecInt.reg.getWReg();
+    	if(buf>=0){
+			setCFlag(1337);
+		}else{
+			setCFlag(buf);
+		}
+    	setZFlag(buf);
+    	buf = valsmaller0(buf);
+    	checkDandInsert(buf, f, d);
+    	//TODO Handelt es sich hierbei um ein Sonderfall zwecks C-Flag?
     	ParDecInt.reg.increasePC();
     }
     
@@ -221,12 +240,15 @@ public class PicCPU {
 	}
 	
 	public void call(int k){
+		//TODO Was passiert mit PC?
 		ParDecInt.reg.pushPCtoStack();
 		ParDecInt.reg.setPC(k);
 	}
 	
 	public void clrwdt(){
 		//TODO
+		
+		ParDecInt.reg.increasePC();
 	}
 	
 	public void instGoto(int k){
@@ -251,9 +273,11 @@ public class PicCPU {
 	}
 	
 	public void retLW(int k){
-		int buf = ParDecInt.reg.popPCfromStack(); 
 		checkDandInsert(k,0,0);	
+		int buf = ParDecInt.reg.popPCfromStack(); 
 		ParDecInt.reg.setPC(buf);
+		System.out.println(ParDecInt.reg.getPC());
+		sleep();
 	}
 	
 	public void instReturn(){
@@ -266,21 +290,37 @@ public class PicCPU {
 	}
 	
 	public void subLW(int k){
-		//TODO
+		int w = ParDecInt.reg.getWReg();
+		int buf = k-w;
+		/**Folgende Abfrage muss gemacht werden, da 
+		 * es sich bei SUBLW um einen Sonderfall handelt
+		 */
+		if(buf>=0){
+			setCFlag(1337);
+		}else{
+			setCFlag(buf);
+		}
+		setZFlag(buf);
+		buf = valsmaller0(buf);
+		checkDandInsert(buf,0,0);
+		ParDecInt.reg.increasePC();
 	}
 	
 	public void xorLW(int k){
 		int w = ParDecInt.reg.getWReg();
 		int buf = k ^ w;
 		setZFlag(buf);
-        checkDandInsert(buf, 0, 0);
+        checkDandInsert(buf,0,0);
     	ParDecInt.reg.increasePC();
 	}
 	
 	
     /*---------------------------------------
-     * anderer KÔøΩse
+     * anderer K‰se
      *---------------------------------------*/
+	/**Pr¸ft zun‰hst welche Bank aktuell gew‰hlt ist 
+	 * und holt entsprechend aus dieser den Wert der Adresse
+	 */
     public int getValFromBank(int f){
     	if(ParDecInt.reg.getBank()==0){
     		return ParDecInt.reg.getRegister0(f);
@@ -289,8 +329,8 @@ public class PicCPU {
 		}
     }
     
-	/**PrÔøΩft ob f gesetzt ist. Wenn nein, wird 
-	 * der Inhalt im FSR ÔøΩbergeben
+	/**Pr¸ft ob f gesetzt ist. Wenn nein, wird 
+	 * der Inhalt im FSR ¸bergeben
 	 */
 	public int getIndirectAdress(int f){
 		if(f==0){
@@ -317,8 +357,7 @@ public class PicCPU {
 	private void setZFlag(int val){
 		if (val==0){
 			ParDecInt.reg.setStatusReg(ParDecInt.reg.zFlag, 1);
-		}
-		if (val>0){
+		}else{
 			ParDecInt.reg.setStatusReg(ParDecInt.reg.zFlag, 0);
 		}
 	}
@@ -331,8 +370,16 @@ public class PicCPU {
 		}
 	}
 	
-	/**Pr√ºft ob d gesetzt, um zu entscheiden ob in W 
-	 * oder ins Register geschrieben wird. 
+	private int valsmaller0(int val){
+		if(val<0){
+			return(256-val);
+		}else{
+			return val;
+		}
+	}
+	
+	/**Pr¸ft ob d gesetzt, um zu entscheiden ob in W 
+	 * oder ins f-Register geschrieben wird. 
 	 */
 	private void checkDandInsert(int buf, int f, int d){
 			if(d==0){

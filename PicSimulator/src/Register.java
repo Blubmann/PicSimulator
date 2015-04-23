@@ -1,3 +1,6 @@
+import java.util.ArrayDeque;
+import java.util.Deque;
+import java.util.EmptyStackException;
 import java.util.Stack;
 import java.util.Vector;
 
@@ -48,12 +51,20 @@ public class Register {
 		this.bank1[trisB] = 255;
 	}
 	
-	public void pushPCtoStack(){
+	/**Speichert den PC für den Folgebefehl nach z.B. einem Call
+	 */
+	public synchronized void pushPCtoStack(){
 		stack.push(pc+1);
 	}
 	
-	public int popPCfromStack(){
-		return stack.pop();
+	/**Holt den den obersten PC vom Stack*/
+	public synchronized int popPCfromStack(){
+		try{
+			return stack.pop();
+		}catch(EmptyStackException est){
+            System.err.println("Stack ist leer! " + est.fillInStackTrace());
+            return -1;
+		}
 	}
 	/**Der Inhalt von Bank0 und Bank1 sind identisch. Wenn f=0 ist,
 	 * wird geprüft was im FSR steht. Wenn < 127 kann es so direkt 
@@ -103,6 +114,7 @@ public class Register {
 		return bank1[f];
 	}
 	
+	
 	public void printRegister(){
 		for(int i=0; i <= 127; i++){
 			System.out.println("Registernummer "+i+" Bank0: " +bank0[i]);
@@ -145,7 +157,7 @@ public class Register {
 	}
 	
 	/**Erhöht den PC im eins und aktualisiert ihn auf beiden Bänken**/
-	public void increasePC(){
+	public synchronized void increasePC(){
 		pc++;
 		bank0[pcl]=pc;
 		bank1[pcl]=pc;
@@ -159,6 +171,7 @@ public class Register {
             bank1[f] = val;
         }
     }
+	
 	
 	public void setPC(int actualPC){
 		int pcLath = bank0[pclath];
