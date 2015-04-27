@@ -82,7 +82,14 @@ public class Register {
 			return f;
 		}
 	}
+	public void setGui(){
+		MainGUI.textField.setText(Integer.toHexString(getWReg())); 
+		MainGUI.textField_1.setText(Integer.toHexString(getBank()));
+	}
 	
+	public void readGui(){
+		bank0[portA]=MainGUI.getPinsPortA();
+	}
 	/**Statusregister ist ein 8-Zellenarray, damit
 	 * ist ein einfacheres bitsetzen möglich 
 	 */
@@ -93,6 +100,15 @@ public class Register {
 	public int getStatusReg(int pos){
 		return statusReg[pos];
 	}
+	
+	public void statusToMemory() {
+        String statusAsHex = "";
+        for (int i = 7; i >= 0; i--) {
+            statusAsHex += String.valueOf(statusReg[i]);
+        }
+        bank0[status] = Integer.parseInt(statusAsHex, 16);
+        bank1[status] = Integer.parseInt(statusAsHex, 16);
+    }
 	
 	/**Inhalt einer Zelle auf Bank0 setzen**/
 	public void setRegister0(int f, int result){

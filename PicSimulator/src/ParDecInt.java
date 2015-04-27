@@ -1,3 +1,5 @@
+import javax.swing.plaf.SliderUI;
+
 
 public class ParDecInt extends Thread{
 	public String[] code;
@@ -12,11 +14,14 @@ public class ParDecInt extends Thread{
 		//System.out.println("Test");
 		if(MainGUI.run==true){
 			for (i = 0; i <= (instructions.length - 1); i++) {
-				i=reg.getPC();
-				decode(i);
-				System.out.println(ParDecInt.reg.popPCfromStack());
 				try {
-					sleep(500);
+					sleep(MainGUI.slider.getValue());
+					reg.setBank();
+					reg.statusToMemory();
+					i=reg.getPC();
+					decode(i);
+					reg.readGui();
+					reg.setGui();
 				} catch (InterruptedException e) {
 					// TODO Auto-generated catch block
 					e.printStackTrace();
@@ -27,6 +32,9 @@ public class ParDecInt extends Thread{
 		i=reg.getPC();
 		if(MainGUI.step=true && i<=(instructions.length-1)){
 				decode(i);
+				reg.setBank();
+				reg.statusToMemory();
+				MainGUI.regtab.updateTable0(MainGUI.scrollPane_1);
 				System.out.println("PCL: "+reg.getPC());
 				System.out.println("W-Register: "+reg.getWReg());
 				MainGUI.step=false;
