@@ -58,13 +58,17 @@ public class PicCPU {
 
 	public void decFSZ(int f, int d){
 		f= getIndirectAdress(f);
-		int buf = getValFromBank(f)-1;
-		setZFlag(buf);
+		int buf = getValFromBank(f);
+		if(buf==0){
+			buf=256;
+		}
+		buf=buf-1;
 		checkDandInsert(buf,f,d);
+		ParDecInt.reg.increasePC();
 		if(buf==0){
 			nop();
 		}
-		ParDecInt.reg.increasePC();
+		
 	}
 	
 	public void incF(int f, int d){
@@ -79,12 +83,11 @@ public class PicCPU {
 	public void incFSZ(int f, int d){
     	f = getIndirectAdress(f);
     	int buf = getValFromBank(f)+1;
-    	setZFlag(buf);
-    	buf = valbigger255(buf);
+    	if(buf>255){
+    		buf=0;
+    		nop();
+    	}
     	checkDandInsert(buf,f,d);
-		if(buf==0){
-			nop();
-		}
 		ParDecInt.reg.increasePC();
     }
 	
@@ -181,17 +184,87 @@ public class PicCPU {
     
     public void bcf(int f, int b) {
 		f= getIndirectAdress(f); 
-		int buf = getValFromBank(f);
-		buf = buf  & ~(1 << b);
-    	checkDandInsert(buf,f,1);
+		int mask;
+
+        //Bitmaske aus der Zahl b erzeugen
+        switch (b) {
+            case 0:
+                mask = 1;
+                break;
+            case 1:
+                mask = 2;
+                break;
+            case 2:
+                mask = 4;
+                break;
+            case 3:
+                mask = 8;
+                break;
+            case 4:
+                mask = 16;
+                break;
+            case 5:
+                mask = 32;
+                break;
+            case 6:
+                mask = 64;
+                break;
+            case 7:
+                mask = 128;
+                break;
+            default:
+                System.err.println("Error beim setzen des Bits!");
+                return;
+        }
+        if(f== ParDecInt.reg.status){
+			ParDecInt.reg.setStatusReg(b, 0);
+		}else{
+			int buf = getValFromBank(f)^mask;
+	    	checkDandInsert(buf,f,1);
+		}
     	ParDecInt.reg.increasePC();
     }    
     
     public void bsf(int f, int b) {
 		f= getIndirectAdress(f); 
-		int buf = getValFromBank(f);
-		buf = buf  | (1 << b);
-    	checkDandInsert(buf,f,1);
+		int mask;
+
+        //Bitmaske aus der Zahl b erzeugen
+        switch (b) {
+            case 0:
+                mask = 1;
+                break;
+            case 1:
+                mask = 2;
+                break;
+            case 2:
+                mask = 4;
+                break;
+            case 3:
+                mask = 8;
+                break;
+            case 4:
+                mask = 16;
+                break;
+            case 5:
+                mask = 32;
+                break;
+            case 6:
+                mask = 64;
+                break;
+            case 7:
+                mask = 128;
+                break;
+            default:
+                System.err.println("Error beim Setzen des Bits!");
+                return;
+        }
+		if(f== ParDecInt.reg.status){
+			ParDecInt.reg.setStatusReg(b, 1);
+		}else{
+			int buf = getValFromBank(f)^mask;
+	    	checkDandInsert(buf,f,1);
+		}
     	ParDecInt.reg.increasePC();
     }   
  
@@ -387,6 +460,7 @@ public class PicCPU {
 			}else{
 				if(ParDecInt.reg.getBank()==0){
 					ParDecInt.reg.setRegister0(f, buf);
+					System.out.println("Im Register0 steht an Stelle "+f+" die Zahl"+buf);
 					ParDecInt.reg.synchronizeBothBanks(f, buf);
 				}else{
 					ParDecInt.reg.setRegister1(f, buf);

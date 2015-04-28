@@ -1,8 +1,8 @@
-import java.util.ArrayDeque;
-import java.util.Deque;
 import java.util.EmptyStackException;
 import java.util.Stack;
-import java.util.Vector;
+
+import javax.swing.DefaultListModel;
+
 
 public class Register {
 	
@@ -40,10 +40,11 @@ public class Register {
     private int[] statusReg = new int[8];
 	int[] bank0 = new int[128];
 	int[] bank1 = new int[128];
-    public int activeBank = 0;
+    public static int activeBank;
 	private int wReg;
 	
-		
+	
+	/**Belegung mit Initwerten**/
 	public Register(){
 		this.wReg=0;
 		this.pc=0;
@@ -82,16 +83,107 @@ public class Register {
 			return f;
 		}
 	}
-	public void setGui(){
-		MainGUI.textField.setText(Integer.toHexString(getWReg())); 
-		MainGUI.textField_1.setText(Integer.toHexString(getBank()));
+	
+	/**Methode um die Gui auf Basis des Regiters zu aktualisieren. 
+	 * Die RadioButtons für Pins und Tris werden somit aktualisiert.
+	 */
+	public void refreshGUI(){
+		setGuiFlags();
+		MainGUI.setPinsPortA();
+		MainGUI.setPinsPortB();
+		MainGUI.setTrisPortA();
+		MainGUI.setTrisPortB();
+		updateStack();
+		if(MainGUI.bank==true){
+			MainGUI.regtab.updateTable0(MainGUI.scrollPane_1);
+		}else{
+			MainGUI.regtab.updateTable1(MainGUI.scrollPane_1);
+		}
 	}
 	
+	/**Holt sich den Stack als Objekt und schreibt ihn dann auf de Gui**/
+	public void updateStack(){
+		final Object[] stack = getStack();
+		@SuppressWarnings({ "serial", "rawtypes", "unchecked" })
+		DefaultListModel model = new DefaultListModel() {
+	            {
+	            	for (int i=0;i<stack.length;i++){
+	                addElement(stack[i]);
+	            	}
+	            }
+	        };
+		MainGUI.stackList.setModel(model);
+	}
+	/**Hier werden alle wichtigen Flags auf die Gui geschrieben**/
+	public void setGuiFlags(){
+		MainGUI.textField_WReg.setText(Integer.toHexString(getWReg())); 
+		MainGUI.textField_Bank.setText(Integer.toHexString(getBank()));
+		MainGUI.textField_Status.setText(Integer.toHexString(bank0[status]));
+		MainGUI.textField_Z.setText(Integer.toHexString(getStatusReg(2)));
+		MainGUI.textField_C.setText(Integer.toHexString(getStatusReg(0)));
+		MainGUI.textField_DC.setText(Integer.toHexString(getStatusReg(1)));
+	}
+	
+	/**Ruft die Methoden zum Lesen der Radiobuttons für die PortPins auf**/
 	public void readGui(){
 		bank0[portA]=MainGUI.getPinsPortA();
+		bank0[portB]=MainGUI.getPinsPortB();
 	}
+	
+	/**Methode um aus der Dezimalzahl ein Array mit 0/1 zu machen.
+	 * Bsp: a = 5 -> 5%2=1 ->trisBBits[0]=1 ->5/2=2.5=2
+	 * 		a = 2 -> 2%2=0 ->.....
+	 */
+	public int[] getTrisB() {
+        int a = this.bank1[trisB];
+        int[] trisBBits = new int[8];
+
+        for (int i = 0; i <8; i++) {
+            trisBBits[i] = a % 2;
+            a /= 2;
+        }
+
+        return trisBBits;
+    }
+	
+	public int[] getTrisA() {
+        int a = this.bank1[trisA];
+        int[] trisABits = new int[5];
+
+        for (int i = 0; i <5; i++) {
+            trisABits[i] = a % 2;
+            a /= 2;
+        }
+
+        return trisABits;
+    }
+	
+	public int[] getPortA(){
+		int a = this.bank0[portA];
+        int[] portABits = new int[5];
+
+        for (int i = 0; i <=4; i++) {
+            portABits[i] = a % 2;
+            a /= 2;
+        }
+
+        return portABits;
+	}
+	
+	public int[] getPortB(){
+		int a = this.bank0[portB];
+        int[] portBBits = new int[8];
+
+        for (int i = 0; i <=7; i++) {
+            portBBits[i] = a % 2;
+            a /= 2;
+        }
+
+        return portBBits;
+	}
+	
 	/**Statusregister ist ein 8-Zellenarray, damit
-	 * ist ein einfacheres bitsetzen möglich 
+	 * ist ein einfacheres Bitsetzen möglich 
 	 */
 	public void setStatusReg(int pos, int val){
 		statusReg[pos]=val;
@@ -101,13 +193,17 @@ public class Register {
 		return statusReg[pos];
 	}
 	
+	/**Synchronisiert das Statusarray mit der dem Statusregister**/
 	public void statusToMemory() {
-        String statusAsHex = "";
-        for (int i = 7; i >= 0; i--) {
-            statusAsHex += String.valueOf(statusReg[i]);
+		int buf=0;
+        for (int i = 0; i <=7; i++) {
+        	if(statusReg[i]==1){
+        		buf=(int) (buf+Math.pow(2, i));
+        	}
         }
-        bank0[status] = Integer.parseInt(statusAsHex, 16);
-        bank1[status] = Integer.parseInt(statusAsHex, 16);
+        System.out.println("Es wird "+buf+" in die Register geschrieben");
+        bank0[status] = buf;
+        bank1[status] = buf;
     }
 	
 	/**Inhalt einer Zelle auf Bank0 setzen**/
@@ -151,16 +247,16 @@ public class Register {
 	
 	/**Setzen der Bank aufgrund des Bits im Statusregister**/
 	public void setBank(){
-		if(statusReg[rp0]==0){
-			activeBank =0;
-		} else{
+		if((bank0[status]&32)==32){
 			activeBank =1;
+		} else{
+			activeBank =0;
 		}
 	}
 	
 	/**Übergibt die aktuelle Banknummer**/
 	public int getBank(){
-		if(statusReg[rp0]==0){
+		if(activeBank==0){
 			return 0;
 		} else{
 			return 1;
@@ -187,6 +283,12 @@ public class Register {
             bank1[f] = val;
         }
     }
+	
+	public Object[] getStack(){
+		
+		return (Object[]) stack.toArray();
+		
+	}
 	
 	
 	public void setPC(int actualPC){

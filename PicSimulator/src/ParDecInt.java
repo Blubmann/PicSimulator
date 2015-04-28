@@ -15,13 +15,29 @@ public class ParDecInt extends Thread{
 		if(MainGUI.run==true){
 			for (i = 0; i <= (instructions.length - 1); i++) {
 				try {
-					sleep(MainGUI.slider.getValue());
-					reg.setBank();
-					reg.statusToMemory();
+					
 					i=reg.getPC();
 					decode(i);
+					reg.statusToMemory();
+					reg.setBank();
+					reg.refreshGUI();
+					sleep(MainGUI.slider.getValue());
 					reg.readGui();
-					reg.setGui();
+					/**
+					System.out.println("Status 0: "+reg.getStatusReg(0));
+					System.out.println("Status 1: "+reg.getStatusReg(1));
+					System.out.println("Status 2: "+reg.getStatusReg(2));
+					System.out.println("Status 3: "+reg.getStatusReg(3));
+					System.out.println("Status 4: "+reg.getStatusReg(4));
+					System.out.println("Status 5: "+reg.getStatusReg(5));
+					System.out.println("Status 6: "+reg.getStatusReg(6));
+					System.out.println("Status 7: "+reg.getStatusReg(7));
+					System.out.println("Status: "+reg.bank0[3]);
+					System.out.println("Aktive Bank "+reg.activeBank);
+					System.out.println("PortA "+reg.getRegister0(5));
+					System.out.println("PortB "+reg.getRegister0(6));
+					**/
+
 				} catch (InterruptedException e) {
 					// TODO Auto-generated catch block
 					e.printStackTrace();
