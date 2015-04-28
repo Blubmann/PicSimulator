@@ -36,6 +36,9 @@ import java.util.Vector;
 import javax.swing.JList;
 import javax.swing.table.DefaultTableModel;
 import javax.swing.JLayeredPane;
+import javax.swing.JSlider;
+import javax.swing.JLabel;
+import javax.swing.JRadioButton;
 
 
 public class MainGUI extends JFrame{
@@ -45,8 +48,24 @@ public class MainGUI extends JFrame{
 	public ParDecInt pardecint;
 	private CodeTable codetab;
 	public static RegTable regtab;
-	private JScrollPane scrollPane = new JScrollPane();
+	public static JScrollPane scrollPane = new JScrollPane();
 	public static JScrollPane scrollPane_1 = new JScrollPane();
+	public static JSlider slider = new JSlider(0,1000,500);
+	public static JTextField textField = new JTextField();
+	public static JTextField textField_1 = new JTextField();
+	static JRadioButton radioButtonPortAPin0 = new JRadioButton("");
+	static JRadioButton radioButtonPortAPin1 = new JRadioButton("");
+	static JRadioButton radioButtonPortAPin2 = new JRadioButton("");
+	static JRadioButton radioButtonPortAPin3 = new JRadioButton("");
+	static JRadioButton radioButtonPortAPin4 = new JRadioButton("");
+	JRadioButton radioButtonPortATris7 = new JRadioButton("");
+	JRadioButton radioButtonPortATris6 = new JRadioButton("");
+	JRadioButton radioButtonPortATris5 = new JRadioButton("");
+	JRadioButton radioButtonPortATris4 = new JRadioButton("");
+	JRadioButton radioButtonPortATris3 = new JRadioButton("");
+	JRadioButton radioButtonPortATris2 = new JRadioButton("");
+	JRadioButton radioButtonPortATris1 = new JRadioButton("");
+	JRadioButton radioButtonPortATris0 = new JRadioButton("");
 	private Boolean checkbox;
 	public static boolean run;
 	public static boolean step;
@@ -71,8 +90,9 @@ public class MainGUI extends JFrame{
 	 * Create the frame.
 	 */
 	public MainGUI() {
+		setTitle("Pic");
 		setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
-		setBounds(100, 100, 1095, 754);
+		setBounds(100, 100, 1156, 825);
 		
 		JMenuBar menuBar = new JMenuBar();
 		setJMenuBar(menuBar);
@@ -150,6 +170,121 @@ public class MainGUI extends JFrame{
 		});
 		btnStepbystep.setBounds(98, 11, 101, 23);
 		contentPane.add(btnStepbystep);
+		
+		slider.setBounds(237, 11, 95, 23);
+		contentPane.add(slider);
+		
+		JLabel lblPortA = new JLabel("Port A");
+		lblPortA.setBounds(62, 532, 46, 14);
+		contentPane.add(lblPortA);
+		
+		JLabel lblTris = new JLabel("Tris");
+		lblTris.setBounds(110, 532, 46, 14);
+		contentPane.add(lblTris);
+		
+		JLabel lblPin = new JLabel("Pin");
+		lblPin.setBounds(22, 532, 46, 14);
+		contentPane.add(lblPin);
+		
+		JLabel label = new JLabel("7");
+		label.setBounds(22, 548, 14, 14);
+		contentPane.add(label);
+		
+		JLabel label_1 = new JLabel("6");
+		label_1.setBounds(22, 573, 14, 14);
+		contentPane.add(label_1);
+		
+		JLabel label_2 = new JLabel("5");
+		label_2.setBounds(22, 598, 14, 14);
+		contentPane.add(label_2);
+		
+		JLabel label_3 = new JLabel("4");
+		label_3.setBounds(22, 623, 14, 14);
+		contentPane.add(label_3);
+		
+		JLabel label_4 = new JLabel("3");
+		label_4.setBounds(22, 648, 14, 14);
+		contentPane.add(label_4);
+		
+		JLabel label_5 = new JLabel("2");
+		label_5.setBounds(22, 673, 14, 14);
+		contentPane.add(label_5);
+		
+		JLabel label_6 = new JLabel("1");
+		label_6.setBounds(22, 698, 14, 14);
+		contentPane.add(label_6);
+		
+		JLabel label_7 = new JLabel("0");
+		label_7.setBounds(22, 723, 14, 14);
+		contentPane.add(label_7);
+		
+		radioButtonPortAPin4.setBounds(62, 619, 21, 23);
+		contentPane.add(radioButtonPortAPin4);
+		
+		radioButtonPortAPin3.setBounds(62, 644, 21, 23);
+		contentPane.add(radioButtonPortAPin3);
+		
+		radioButtonPortAPin2.setBounds(62, 669, 21, 23);
+		contentPane.add(radioButtonPortAPin2);
+		
+		radioButtonPortAPin1.setBounds(62, 694, 21, 23);
+		contentPane.add(radioButtonPortAPin1);
+		
+		radioButtonPortAPin0.setBounds(62, 719, 21, 23);
+		contentPane.add(radioButtonPortAPin0);
+		
+		radioButtonPortATris7.setEnabled(false);
+		radioButtonPortATris7.setBounds(110, 547, 21, 23);
+		contentPane.add(radioButtonPortATris7);
+		
+		radioButtonPortATris6.setBounds(110, 573, 21, 23);
+		contentPane.add(radioButtonPortATris6);
+		
+		radioButtonPortATris5.setBounds(110, 594, 21, 23);
+		contentPane.add(radioButtonPortATris5);
+		
+		radioButtonPortATris4.setBounds(110, 619, 21, 23);
+		contentPane.add(radioButtonPortATris4);
+		
+		radioButtonPortATris3.setBounds(110, 644, 21, 23);
+		contentPane.add(radioButtonPortATris3);
+		
+		radioButtonPortATris2.setBounds(110, 669, 21, 23);
+		contentPane.add(radioButtonPortATris2);
+		
+		radioButtonPortATris1.setBounds(110, 694, 21, 23);
+		contentPane.add(radioButtonPortATris1);
+		
+		radioButtonPortATris0.setBounds(110, 719, 21, 23);
+		contentPane.add(radioButtonPortATris0);
+		
+		JButton btnTestbutton = new JButton("Testbutton");
+		btnTestbutton.addActionListener(new ActionListener() {
+			public void actionPerformed(ActionEvent arg0) {
+				ParDecInt.reg.setRegister0(6, 1);
+			}
+		});
+		btnTestbutton.setBounds(243, 71, 89, 23);
+		contentPane.add(btnTestbutton);
+		
+		JLabel lblWregister = new JLabel("W-Register");
+		lblWregister.setBounds(994, 532, 62, 14);
+		contentPane.add(lblWregister);
+		
+		
+		textField.setEditable(false);
+		textField.setBounds(1073, 529, 40, 20);
+		contentPane.add(textField);
+		textField.setColumns(10);
+		
+		textField_1.setEditable(false);
+		textField_1.setBounds(1073, 557, 40, 20);
+		contentPane.add(textField_1);
+		textField_1.setColumns(10);
+		
+		JLabel lblBank = new JLabel("Bank");
+		lblBank.setBounds(994, 557, 46, 14);
+		contentPane.add(lblBank);
 		
 	}	
 	
@@ -230,6 +365,91 @@ public class MainGUI extends JFrame{
             System.out.println("Es ist ein Fehler beim lesen der Datei aufgetreten");
             e.printStackTrace();
         }
+	}
+	
+	public void setTrisPortA(){
+		
+	}
+	
+	public static int getPinsPortA(){
+		int buf[] = new int[5];
+		int buffer=0;
+		if(radioButtonPortAPin0.isSelected()==true){
+			buf[0]=1;
+			System.out.println("Pin0 Port A ist aktiv");
+		}else{
+			buf[0]=0;
+		}
+		if(radioButtonPortAPin1.isSelected()==true){
+			buf[1]=1;
+		}else{
+			buf[1]=0;
+		}
+		if(radioButtonPortAPin2.isSelected()==true){
+			buf[2]=1;
+		}else{
+			buf[2]=0;
+		}
+		if(radioButtonPortAPin3.isSelected()==true){
+			buf[3]=1;
+		}else{
+			buf[3]=0;
+		}
+		if(radioButtonPortAPin4.isSelected()==true){
+			buf[4]=1;
+		}else{
+			buf[4]=0;
+		}
+		for(int i =0; i<= 4; i++){
+			if(buf[i]==1)
+				buffer=(int) (buffer+Math.pow(2,i));
+		}
+		return buffer;
+	}
+	
+	public int[] getTrisPortA(){
+		int buf[] = new int[5];
+		if(radioButtonPortATris0.isSelected()==true){
+			buf[0]=1;
+		}else{
+			buf[0]=0;
+		}
+		if(radioButtonPortATris1.isSelected()==true){
+			buf[1]=1;
+		}else{
+			buf[1]=0;
+		}
+		if(radioButtonPortATris2.isSelected()==true){
+			buf[2]=1;
+		}else{
+			buf[2]=0;
+		}
+		if(radioButtonPortATris3.isSelected()==true){
+			buf[3]=1;
+		}else{
+			buf[3]=0;
+		}
+		if(radioButtonPortATris4.isSelected()==true){
+			buf[4]=1;
+		}else{
+			buf[4]=0;
+		}
+		if(radioButtonPortATris5.isSelected()==true){
+			buf[5]=1;
+		}else{
+			buf[5]=0;
+		}
+		if(radioButtonPortATris6.isSelected()==true){
+			buf[6]=1;
+		}else{
+			buf[6]=0;
+		}
+		if(radioButtonPortATris7.isSelected()==true){
+			buf[7]=1;
+		}else{
+			buf[7]=0;
+		}
+		return buf;
 	}
 	
 	private static void addPopup(Component component, final JPopupMenu popup) {

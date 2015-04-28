@@ -1,3 +1,6 @@
+import java.util.ArrayDeque;
+import java.util.Deque;
+import java.util.EmptyStackException;
 import java.util.Stack;
 import java.util.Vector;
 
@@ -48,12 +51,20 @@ public class Register {
 		this.bank1[trisB] = 255;
 	}
 	
-	public void pushPCtoStack(){
+	/**Speichert den PC für den Folgebefehl nach z.B. einem Call
+	 */
+	public synchronized void pushPCtoStack(){
 		stack.push(pc+1);
 	}
 	
-	public int popPCfromStack(){
-		return stack.pop();
+	/**Holt den den obersten PC vom Stack*/
+	public synchronized int popPCfromStack(){
+		try{
+			return stack.pop();
+		}catch(EmptyStackException est){
+            System.err.println("Stack ist leer! " + est.fillInStackTrace());
+            return -1;
+		}
 	}
 	/**Der Inhalt von Bank0 und Bank1 sind identisch. Wenn f=0 ist,
 	 * wird geprüft was im FSR steht. Wenn < 127 kann es so direkt 
@@ -71,7 +82,14 @@ public class Register {
 			return f;
 		}
 	}
+	public void setGui(){
+		MainGUI.textField.setText(Integer.toHexString(getWReg())); 
+		MainGUI.textField_1.setText(Integer.toHexString(getBank()));
+	}
 	
+	public void readGui(){
+		bank0[portA]=MainGUI.getPinsPortA();
+	}
 	/**Statusregister ist ein 8-Zellenarray, damit
 	 * ist ein einfacheres bitsetzen möglich 
 	 */
@@ -82,6 +100,15 @@ public class Register {
 	public int getStatusReg(int pos){
 		return statusReg[pos];
 	}
+	
+	public void statusToMemory() {
+        String statusAsHex = "";
+        for (int i = 7; i >= 0; i--) {
+            statusAsHex += String.valueOf(statusReg[i]);
+        }
+        bank0[status] = Integer.parseInt(statusAsHex, 16);
+        bank1[status] = Integer.parseInt(statusAsHex, 16);
+    }
 	
 	/**Inhalt einer Zelle auf Bank0 setzen**/
 	public void setRegister0(int f, int result){
@@ -102,6 +129,7 @@ public class Register {
 	public int getRegister1(int f){
 		return bank1[f];
 	}
+	
 	
 	public void printRegister(){
 		for(int i=0; i <= 127; i++){
@@ -145,7 +173,7 @@ public class Register {
 	}
 	
 	/**Erhöht den PC im eins und aktualisiert ihn auf beiden Bänken**/
-	public void increasePC(){
+	public synchronized void increasePC(){
 		pc++;
 		bank0[pcl]=pc;
 		bank1[pcl]=pc;
@@ -159,6 +187,7 @@ public class Register {
             bank1[f] = val;
         }
     }
+	
 	
 	public void setPC(int actualPC){
 		int pcLath = bank0[pclath];

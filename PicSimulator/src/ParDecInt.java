@@ -1,3 +1,5 @@
+import javax.swing.plaf.SliderUI;
+
 
 public class ParDecInt extends Thread{
 	public String[] code;
@@ -12,20 +14,32 @@ public class ParDecInt extends Thread{
 		//System.out.println("Test");
 		if(MainGUI.run==true){
 			for (i = 0; i <= (instructions.length - 1); i++) {
-				i=reg.getPC();
-				decode(i);
+				try {
+					sleep(MainGUI.slider.getValue());
+					reg.setBank();
+					reg.statusToMemory();
+					i=reg.getPC();
+					decode(i);
+					reg.readGui();
+					reg.setGui();
+				} catch (InterruptedException e) {
+					// TODO Auto-generated catch block
+					e.printStackTrace();
+				}
 			}
 			MainGUI.run=false;
 		}
 		i=reg.getPC();
 		if(MainGUI.step=true && i<=(instructions.length-1)){
-				System.out.println("I: " +i);
 				decode(i);
+				reg.setBank();
+				reg.statusToMemory();
+				MainGUI.regtab.updateTable0(MainGUI.scrollPane_1);
 				System.out.println("PCL: "+reg.getPC());
+				System.out.println("W-Register: "+reg.getWReg());
 				MainGUI.step=false;
 		}
 		//reg.printRegister();
-		
 	}
 	
     public void start (){
@@ -40,7 +54,7 @@ public class ParDecInt extends Thread{
 		
 	}
 	
-	/**ParDecInt bekommt ein Array ï¿½bergeben, indem der die relevanten Quellcodezeilen als String gespechert sind.
+	/**ParDecInt bekommt ein Array übergeben, indem der die relevanten Quellcodezeilen als String gespechert sind.
 	 * Der Opcode wird aus den Zeilen extrahiert und in eine Integerzahl umgewandelt.
 	 */
 	public ParDecInt(String[] icode){
@@ -59,10 +73,10 @@ public class ParDecInt extends Thread{
 		instructions=newInst;
 	}
 	
-	/**Die Methode bekommt beim Drï¿½cken der Starttaste den extrahierten Opcode ï¿½bergeben und 
-	 * prï¿½ft mithilfe der der Integerzahl welcher Befehl vorliegt.
+	/**Die Methode bekommt beim Drücken der Starttaste den extrahierten Opcode übergeben und 
+	 * prüft mithilfe der der Integerzahl welcher Befehl vorliegt.
 	 */
-	public void decode(int line){
+	public synchronized void decode(int line){
 		if (instructions[line] >= 1792 && instructions[line] <= 2047) {
             int f = instructions[line] & 127;
             int d = instructions[line] & 128;
@@ -70,7 +84,7 @@ public class ParDecInt extends Thread{
             cpu.addWF(f, d);
 
 		}
-		else if (instructions[line] >= 1792 && instructions[line] <= 2047) {
+		else if (instructions[line] >= 1280 && instructions[line] <= 1535) {
             int f = instructions[line] & 127;
             int d = instructions[line] & 128;
             System.out.println("ANDWF, f ist " + f +" d ist " + d);
@@ -148,7 +162,7 @@ public class ParDecInt extends Thread{
             cpu.rrf(f, d);
             System.out.println("RRF, f ist " + f +" d ist " + d);
 		}
-		else if(instructions[line] >= 1024 && instructions[line] <= 1279){
+		else if(instructions[line] >= 512 && instructions[line] <= 767){
 			int f = instructions[line] & 127;
             int d = instructions[line] & 128;
             cpu.subWF(f, d);
@@ -195,7 +209,7 @@ public class ParDecInt extends Thread{
             cpu.addLW(k);
             System.out.println("ADDLW, k ist " + k);
 		}
-		else if (instructions[line] >= 15872 && instructions[line] <= 16383) {
+		else if (instructions[line] >= 14592 && instructions[line] <= 14847) {
             int k = instructions[line] & 255;
             cpu.andLW(k);
             System.out.println("ANDLW, k ist " + k);
@@ -243,7 +257,7 @@ public class ParDecInt extends Thread{
 			cpu.sleep();
             System.out.println("SLEEP");
 		}
-		else if (instructions[line] >= 15360 && instructions[line] <= 15615) {
+		else if (instructions[line] >= 15360 && instructions[line] <= 15871) {
             int k = instructions[line] & 255;
             cpu.subLW(k);
             System.out.println("SUBLW, k ist " + k);
@@ -252,6 +266,9 @@ public class ParDecInt extends Thread{
             int k = instructions[line] & 255;
             cpu.xorLW(k);
             System.out.println("XORLW, k ist " + k);
+		}
+		else{
+			System.out.println("Keine passende Operation gefunden");
 		}
 	}
 	
