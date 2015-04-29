@@ -408,6 +408,9 @@ public class MainGUI extends JFrame{
 		scrollPane_2.setViewportView(stackList);
 	}	
 	
+	/**Erstellt den "Datei öffnen"-Dialog, prüft ob eine Datei ausgewählt wurde und übergibt diese an die 
+	 * Methode readandwrite()
+	 */
 	public void openclicked() {
 		File file =null;
 		/** Öffnen des Dialogs für die Auswahl der Datei**/
@@ -428,7 +431,10 @@ public class MainGUI extends JFrame{
         	System.out.println("JFileChooser canceled");
         }
 	}
-		
+	
+	/**readandwrite ließt die Datei zeilenweise aus, filtert die relevanten Codezeilen heraus und übergibt diese 
+	 * an die Klasse ParDecInt. Außerdem werden alle Codezeilen in die Codetabelle geschrieben.
+	 */
 	private void readandwrite(File file){
 		String[] Buffer; //Buffer für Programmcode
 		int j= 0;

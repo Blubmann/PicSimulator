@@ -12,6 +12,7 @@ public class PicCPU {
 		int buf = getValFromBank(f)+w;
 		setCFlag(buf);
 		setZFlag(buf);
+		setDCFlag(buf);
 		buf = valbigger255(buf);
 		checkDandInsert(buf,f,d);
 		ParDecInt.reg.increasePC();
@@ -21,8 +22,8 @@ public class PicCPU {
 		f = getIndirectAdress(f);
 		int w = ParDecInt.reg.getWReg();
 		int buf = getValFromBank(f)&w;
-		buf = valbigger255(buf);
 		setZFlag(buf);
+		buf = valbigger255(buf);
 		checkDandInsert(buf,f,d);
 		ParDecInt.reg.increasePC();
 	}
@@ -153,6 +154,7 @@ public class PicCPU {
 		}else{
 			setCFlag(buf);
 		}
+    	setDCFlag(buf);
     	setZFlag(buf);
     	buf = valsmaller0(buf);
     	checkDandInsert(buf, f, d);
@@ -297,6 +299,7 @@ public class PicCPU {
 		buf = w + k;
 		setCFlag(buf);
 		setZFlag(buf);
+		setDCFlag(buf);
 		buf = valbigger255(buf);
 		checkDandInsert(buf,0,0);
 		ParDecInt.reg.increasePC();
@@ -374,6 +377,7 @@ public class PicCPU {
 			setCFlag(buf);
 		}
 		setZFlag(buf);
+		setDCFlag(buf);
 		buf = valsmaller0(buf);
 		checkDandInsert(buf,0,0);
 		ParDecInt.reg.increasePC();
@@ -432,6 +436,14 @@ public class PicCPU {
 			ParDecInt.reg.setStatusReg(ParDecInt.reg.zFlag, 1);
 		}else{
 			ParDecInt.reg.setStatusReg(ParDecInt.reg.zFlag, 0);
+		}
+	}
+	
+	private void setDCFlag(int val){
+		if((val&0b10000)==0){
+			ParDecInt.reg.setStatusReg(ParDecInt.reg.dcFlag, 0);
+		}else{
+			ParDecInt.reg.setStatusReg(ParDecInt.reg.dcFlag, 1);
 		}
 	}
 	

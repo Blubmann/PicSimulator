@@ -52,13 +52,12 @@ public class Register {
 		this.bank1[trisB] = 255;
 	}
 	
-	/**Speichert den PC für den Folgebefehl nach z.B. einem Call
-	 */
+	/**Speichert den PC für den Folgebefehl nach z.B. einem Call**/
 	public synchronized void pushPCtoStack(){
 		stack.push(pc+1);
 	}
 	
-	/**Holt den den obersten PC vom Stack*/
+	/**Holt den den obersten PC vom Stack**/
 	public synchronized int popPCfromStack(){
 		try{
 			return stack.pop();
@@ -101,7 +100,7 @@ public class Register {
 		}
 	}
 	
-	/**Holt sich den Stack als Objekt und schreibt ihn dann auf de Gui**/
+	/**Holt sich den Stack als Objekt und schreibt ihn dann auf der Gui**/
 	public void updateStack(){
 		final Object[] stack = getStack();
 		@SuppressWarnings({ "serial", "rawtypes", "unchecked" })
@@ -114,6 +113,7 @@ public class Register {
 	        };
 		MainGUI.stackList.setModel(model);
 	}
+	
 	/**Hier werden alle wichtigen Flags auf die Gui geschrieben**/
 	public void setGuiFlags(){
 		MainGUI.textField_WReg.setText(Integer.toHexString(getWReg())); 

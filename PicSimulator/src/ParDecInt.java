@@ -1,6 +1,3 @@
-import javax.swing.plaf.SliderUI;
-
-
 public class ParDecInt extends Thread{
 	public String[] code;
 	public static int[] instructions;
@@ -9,6 +6,7 @@ public class ParDecInt extends Thread{
 	private static PicCPU cpu = new PicCPU();
 	public static Register reg = new Register();
 	
+	/** Es wird geprüft(anhand des Run-/Step-Flags), ob alle BEfehle ausgeführt werden oder nur einer **/
 	public void run(){
 		//System.out.println(instructions[0]);
 		//System.out.println("Test");
@@ -58,6 +56,9 @@ public class ParDecInt extends Thread{
 		//reg.printRegister();
 	}
 	
+	/** Beim betätigen der Buttons Start/Step wird ein Thread gestartet. Das ist wichtig, damit sich die Gui 
+	 *während der Codeinterpretation nicht aufhängt
+	 */
     public void start (){
 	      //System.out.println("Starting");
 	      if (t == null)
