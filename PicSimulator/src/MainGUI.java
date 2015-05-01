@@ -59,6 +59,8 @@ public class MainGUI extends JFrame{
 	public static JTextField textField_DC = new JTextField();
 	public static JTextField textField_C = new JTextField();
 	public static JTextField textField_Z = new JTextField();
+	public static JTextField textField_PCL = new JTextField();
+	public static JTextField textField_Cycle = new JTextField();
 	static JRadioButton radioButtonPortAPin0 = new JRadioButton("");
 	static JRadioButton radioButtonPortAPin1 = new JRadioButton("");
 	static JRadioButton radioButtonPortAPin2 = new JRadioButton("");
@@ -283,7 +285,7 @@ public class MainGUI extends JFrame{
 		btnTestbutton.setBounds(243, 71, 89, 23);
 		contentPane.add(btnTestbutton);
 		
-		JLabel lblWregister = new JLabel("W-Register");
+		JLabel lblWregister = new JLabel("W");
 		lblWregister.setBounds(977, 532, 62, 14);
 		contentPane.add(lblWregister);
 		
@@ -406,6 +408,24 @@ public class MainGUI extends JFrame{
 		scrollPane_2.setBounds(818, 530, 130, 171);
 		contentPane.add(scrollPane_2);
 		scrollPane_2.setViewportView(stackList);
+		
+		JLabel lblPcl = new JLabel("PCL");
+		lblPcl.setBounds(977, 698, 46, 14);
+		contentPane.add(lblPcl);
+		
+		textField_PCL.setEditable(false);
+		textField_PCL.setBounds(1073, 695, 40, 20);
+		contentPane.add(textField_PCL);
+		textField_PCL.setColumns(10);
+		
+		JLabel lblCycle = new JLabel("Cycle");
+		lblCycle.setBounds(977, 723, 46, 14);
+		contentPane.add(lblCycle);
+		
+		textField_Cycle.setEditable(false);
+		textField_Cycle.setBounds(1073, 723, 40, 20);
+		contentPane.add(textField_Cycle);
+		textField_Cycle.setColumns(10);
 	}	
 	
 	/**Erstellt den "Datei öffnen"-Dialog, prüft ob eine Datei ausgewählt wurde und übergibt diese an die 

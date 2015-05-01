@@ -3,22 +3,22 @@ public class ParDecInt extends Thread{
 	public static int[] instructions;
 	private Thread t;
 	private int i=0;
-	private static PicCPU cpu = new PicCPU();
+	public static PicCPU cpu = new PicCPU();
 	public static Register reg = new Register();
 	
-	/** Es wird geprüft(anhand des Run-/Step-Flags), ob alle BEfehle ausgeführt werden oder nur einer **/
+	/** Es wird geprüft(anhand des Run-/Step-Flags), ob alle Befehle ausgeführt werden oder nur einer **/
 	public void run(){
 		//System.out.println(instructions[0]);
 		//System.out.println("Test");
 		if(MainGUI.run==true){
 			for (i = 0; i <= (instructions.length - 1); i++) {
 				try {
-					
 					i=reg.getPC();
 					decode(i);
 					reg.statusToMemory();
 					reg.setBank();
 					reg.refreshGUI();
+					reg.checkInterrupt();
 					sleep(MainGUI.slider.getValue());
 					reg.readGui();
 					/**
@@ -31,9 +31,9 @@ public class ParDecInt extends Thread{
 					System.out.println("Status 6: "+reg.getStatusReg(6));
 					System.out.println("Status 7: "+reg.getStatusReg(7));
 					System.out.println("Status: "+reg.bank0[3]);
-					System.out.println("Aktive Bank "+reg.activeBank);
-					System.out.println("PortA "+reg.getRegister0(5));
-					System.out.println("PortB "+reg.getRegister0(6));
+					System.out.println("Aktive Bank: "+reg.activeBank);
+					System.out.println("PortA: "+reg.getRegister0(5));
+					System.out.println("PortB: "+reg.getRegister0(6));
 					**/
 
 				} catch (InterruptedException e) {
@@ -61,8 +61,7 @@ public class ParDecInt extends Thread{
 	 */
     public void start (){
 	      //System.out.println("Starting");
-	      if (t == null)
-	      {
+	      if (t == null){
 	         t = new Thread (this);
 	         t.start ();
 	      }

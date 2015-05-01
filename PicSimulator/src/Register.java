@@ -7,34 +7,37 @@ import javax.swing.DefaultListModel;
 public class Register {
 	
 	private static int pc;
+	private static boolean bFlanke = false;
+	private static int refRB47Val = 0;
+	public static int cycleCounter;
 	private Stack<Integer> stack = new Stack<Integer>();
 	
 	/**Häufig verwendete Adressen**/
-	public final int tmr0 = 1;
-	public final int option = 1;
-	public final int pcl = 2;
-	public final int status = 3;
-	public final int fsr = 4;
-	public final int portA = 5;
-	public final int trisA = 5;
-	public final int portB = 6;
-	public final int trisB = 6;
-	public final int eedata = 8;
-	public final int eecon1 = 8;
-    public final int eeadr = 9;
-    public final int eecon2 = 9;
-    public final int pclath = 10;
-    public final int intcon = 11;
+	public final int TMR0 = 1;
+	public final int OPTION = 1;
+	public final int PCL = 2;
+	public final int STATUS = 3;
+	public final int FSR = 4;
+	public final int PORTA = 5;
+	public final int TRISA = 5;
+	public final int PORTB = 6;
+	public final int TRISB = 6;
+	public final int EEDATA = 8;
+	public final int EECON1 = 8;
+    public final int EEADR = 9;
+    public final int EECON2 = 9;
+    public final int PCLATH = 10;
+    public final int INTCON = 11;
     
     /**Häufig verwendete Bitpositionen im Statusregister**/
-    public final int cFlag = 0; 
-    public final int dcFlag = 1;
-    public final int zFlag = 2;
-    public final int notPD = 3;
-    public final int notTO = 4;
-    public final int rp0 = 5;
-    public final int rp1 = 6;
-    public final int irp = 7;
+    public final int CFLAG = 0; 
+    public final int DCFLAG = 1;
+    public final int ZFLAG = 2;
+    public final int NOTPD = 3;
+    public final int NOTTO = 4;
+    public final int RP0 = 5;
+    public final int RP1 = 6;
+    public final int IRP = 7;
     
     /**Speicheraufbau**/
     private int[] statusReg = new int[8];
@@ -48,17 +51,18 @@ public class Register {
 	public Register(){
 		this.wReg=0;
 		this.pc=0;
-		this.bank1[trisA] = 31;
-		this.bank1[trisB] = 255;
+		this.cycleCounter=0;
+		this.bank1[TRISA] = 31;
+		this.bank1[TRISB] = 255;
 	}
 	
 	/**Speichert den PC für den Folgebefehl nach z.B. einem Call**/
-	public synchronized void pushPCtoStack(){
+	public void pushPCtoStack(){
 		stack.push(pc+1);
 	}
 	
 	/**Holt den den obersten PC vom Stack**/
-	public synchronized int popPCfromStack(){
+	public int popPCfromStack(){
 		try{
 			return stack.pop();
 		}catch(EmptyStackException est){
@@ -73,10 +77,12 @@ public class Register {
 	 * Dabei ist es egal ob von Bank0 oder Bank1**/
 	public int getIndirectAddress(int f){
 		if(f==0){
-			if(this.bank0[fsr] <= 127){
-				return bank0[fsr];
+			if(this.bank0[FSR] <= 127){
+				activeBank=0;
+				return bank0[FSR];
 			} else{
-				return bank0[fsr] - 128;
+				activeBank=1;
+				return bank0[FSR] - 128;
 			}
 		}else{
 			return f;
@@ -118,16 +124,19 @@ public class Register {
 	public void setGuiFlags(){
 		MainGUI.textField_WReg.setText(Integer.toHexString(getWReg())); 
 		MainGUI.textField_Bank.setText(Integer.toHexString(getBank()));
-		MainGUI.textField_Status.setText(Integer.toHexString(bank0[status]));
+		MainGUI.textField_Status.setText(Integer.toHexString(bank0[STATUS]));
 		MainGUI.textField_Z.setText(Integer.toHexString(getStatusReg(2)));
 		MainGUI.textField_C.setText(Integer.toHexString(getStatusReg(0)));
 		MainGUI.textField_DC.setText(Integer.toHexString(getStatusReg(1)));
+		MainGUI.textField_PCL.setText(Integer.toHexString(bank0[PCL]));
+		MainGUI.textField_Cycle.setText(Integer.toString(cycleCounter));
+
 	}
 	
 	/**Ruft die Methoden zum Lesen der Radiobuttons für die PortPins auf**/
 	public void readGui(){
-		bank0[portA]=MainGUI.getPinsPortA();
-		bank0[portB]=MainGUI.getPinsPortB();
+		bank0[PORTA]=MainGUI.getPinsPortA();
+		bank0[PORTB]=MainGUI.getPinsPortB();
 	}
 	
 	/**Methode um aus der Dezimalzahl ein Array mit 0/1 zu machen.
@@ -135,7 +144,7 @@ public class Register {
 	 * 		a = 2 -> 2%2=0 ->.....
 	 */
 	public int[] getTrisB() {
-        int a = this.bank1[trisB];
+        int a = this.bank1[TRISB];
         int[] trisBBits = new int[8];
 
         for (int i = 0; i <8; i++) {
@@ -147,7 +156,7 @@ public class Register {
     }
 	
 	public int[] getTrisA() {
-        int a = this.bank1[trisA];
+        int a = this.bank1[TRISA];
         int[] trisABits = new int[5];
 
         for (int i = 0; i <5; i++) {
@@ -159,7 +168,7 @@ public class Register {
     }
 	
 	public int[] getPortA(){
-		int a = this.bank0[portA];
+		int a = this.bank0[PORTA];
         int[] portABits = new int[5];
 
         for (int i = 0; i <=4; i++) {
@@ -171,7 +180,7 @@ public class Register {
 	}
 	
 	public int[] getPortB(){
-		int a = this.bank0[portB];
+		int a = this.bank0[PORTB];
         int[] portBBits = new int[8];
 
         for (int i = 0; i <=7; i++) {
@@ -202,8 +211,8 @@ public class Register {
         	}
         }
         System.out.println("Es wird "+buf+" in die Register geschrieben");
-        bank0[status] = buf;
-        bank1[status] = buf;
+        bank0[STATUS] = buf;
+        bank1[STATUS] = buf;
     }
 	
 	/**Inhalt einer Zelle auf Bank0 setzen**/
@@ -247,7 +256,7 @@ public class Register {
 	
 	/**Setzen der Bank aufgrund des Bits im Statusregister**/
 	public void setBank(){
-		if((bank0[status]&32)==32){
+		if((bank0[STATUS]&32)==32){
 			activeBank =1;
 		} else{
 			activeBank =0;
@@ -269,16 +278,20 @@ public class Register {
 	}
 	
 	/**Erhöht den PC im eins und aktualisiert ihn auf beiden Bänken**/
-	public synchronized void increasePC(){
+	public void increasePC(){
 		pc++;
-		bank0[pcl]=pc;
-		bank1[pcl]=pc;
+		bank0[PCL]=pc;
+		bank1[PCL]=pc;
 		System.out.println("PCL erhöht");
+	}
+	
+	public void addCycle(){
+		cycleCounter++;
 	}
 	
 	/**Hält die Registerzellen fsr, status, pclath und intcon synchron**/
 	public void synchronizeBothBanks(int f, int val) {
-        if (f == fsr || f == status || f == pclath || f == intcon) {
+        if (f == FSR || f == STATUS || f == PCLATH || f == INTCON) {
             bank0[f] = val;
             bank1[f] = val;
         }
@@ -290,15 +303,131 @@ public class Register {
 		
 	}
 	
+	public boolean get_GIE(){
+		if(activeBank==0){
+			return ((bank0[INTCON] & 128)==128);
+		}else{
+			return ((bank1[INTCON] & 128)==128);
+		}
+	}
+	
+	public boolean get_INTE(){
+		if(activeBank==0){
+			return ((bank0[INTCON] & 16)==16);
+		}else{
+			return ((bank1[INTCON] & 16)==16);
+		}
+	}
+	
+	public boolean get_INTF(){
+		if(activeBank==0){
+			return ((bank0[INTCON] & 2)==2);
+		}else{
+			return ((bank1[INTCON] & 2)==2);
+		}
+	}
+
+	public boolean get_RBIE(){
+		if(activeBank==0){
+			return ((bank0[INTCON] & 8)==8);
+		}else{
+			return ((bank1[INTCON] & 8)==8);
+		}
+	}
+	
+	public boolean get_RBIF(){
+		if(activeBank==0){
+			return ((bank0[INTCON] & 1)==1);
+		}else{
+			return ((bank1[INTCON] & 1)==1);
+		}
+	}
+	
+	public boolean get_T0IE(){
+		if(activeBank==0){
+			return ((bank0[INTCON] & 32)==32);
+		}else{
+			return ((bank1[INTCON] & 32)==32);
+		}
+	}
+	
+	public boolean get_BINT(){
+		return((bank0[PORTB] & 1)==1);
+	}
+	
+	public boolean get_INTEDG(){
+		return ((bank0[STATUS] & 64) ==64);
+	}
+
+	public boolean get_T0CS(){
+		return ((bank1[OPTION] & 32)==32);
+	}
+	
+	public boolean get_PSA(){
+		return ((bank1[OPTION] & 8)==8);
+	}
+	
+	
+	public void checkInterrupt(){
+		checkRB0Int();
+		checkRB47Int();
+		checkInt();
+	}
+	
+	public void checkRB0Int(){
+		if((get_BINT() == get_INTEDG()) && (get_BINT() != (bFlanke==true))){
+			if(activeBank==0){
+				synchronizeBothBanks(INTCON, bank0[INTCON] | 2);
+			}else{
+				synchronizeBothBanks(INTCON, bank1[INTCON] | 2);
+			}
+		}
+		bFlanke = get_BINT();
+	}
+	
+	public void checkRB47Int(){
+		if((bank0[PORTB]&240)!=refRB47Val){
+			if(activeBank==0){
+				synchronizeBothBanks(INTCON, bank0[INTCON] | 1);
+			}else{
+				synchronizeBothBanks(INTCON, bank1[INTCON] | 1);
+			}
+		}
+		refRB47Val=bank0[INTCON]&240;
+	}
+	
+	public void checkInt(){
+		if(get_GIE()){
+			if(get_INTE() && get_INTF()){
+				handleInt();
+			}
+			if(get_RBIE() && get_RBIF()){
+				handleInt();
+			}
+		}
+	}
+	
+	public void handleInt(){
+		synchronizeBothBanks(INTCON, 127);
+		ParDecInt.cpu.call(4);
+	}
 	
 	public void setPC(int actualPC){
-		int pcLath = bank0[pclath];
+		int pcLath = bank0[PCLATH];
 		pcLath = (Integer.rotateRight(pcLath, 3)) & 0b11;
 		pcLath = Integer.rotateLeft(pcLath, 11);
 		pc= pcLath | actualPC;
-		int pcl = pc & 0b11111111;
-		int newPclath = (Integer.rotateRight(pc, 8)) & 0b11111;
-		synchronizeBothBanks(pcl, pcl);
-		synchronizeBothBanks(pclath, newPclath);
+		int newpcl = pc & 0b11111111;
+		bank0[PCL]= newpcl;
+		bank1[PCL]= newpcl;
+	}
+	
+	public void checkPCL(int val){
+		if(val==2){
+			int pcl = bank0[PCL];
+			int pclath = bank0[PCLATH];
+			int temp =(Integer.rotateLeft(pclath, 8));
+			pc= temp+pcl;
+		}
 	}
 }
