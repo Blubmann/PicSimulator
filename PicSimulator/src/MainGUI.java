@@ -91,6 +91,10 @@ public class MainGUI extends JFrame{
 	public static boolean bank=true;
 	public static boolean run;
 	public static boolean step;
+	private final JLabel lblNewLabel = new JLabel("Frequenz");
+	private final JLabel lblLaufzeit = new JLabel("Laufzeit");
+	private final JTextField textField_Laufzeit = new JTextField();
+	private final JLabel lblStack = new JLabel("Stack");
 	/**
 	 * Launch the application.
 	 */
@@ -111,6 +115,9 @@ public class MainGUI extends JFrame{
 	 * Create the frame.
 	 */
 	public MainGUI() {
+		textField_Laufzeit.setEditable(false);
+		textField_Laufzeit.setBounds(392, 503, 86, 20);
+		textField_Laufzeit.setColumns(10);
 		setTitle("Pic");
 		setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
 		setBounds(100, 100, 1156, 825);
@@ -194,7 +201,7 @@ public class MainGUI extends JFrame{
 		btnStepbystep.setBounds(98, 11, 101, 23);
 		contentPane.add(btnStepbystep);
 		
-		slider.setBounds(237, 11, 95, 23);
+		slider.setBounds(237, 37, 95, 23);
 		contentPane.add(slider);
 		
 		JLabel lblPortA = new JLabel("Port A");
@@ -286,58 +293,58 @@ public class MainGUI extends JFrame{
 		contentPane.add(btnTestbutton);
 		
 		JLabel lblWregister = new JLabel("W");
-		lblWregister.setBounds(977, 532, 62, 14);
+		lblWregister.setBounds(336, 534, 62, 14);
 		contentPane.add(lblWregister);
 		
 		
 		textField_WReg.setEditable(false);
-		textField_WReg.setBounds(1073, 529, 40, 20);
+		textField_WReg.setBounds(392, 531, 40, 20);
 		contentPane.add(textField_WReg);
 		textField_WReg.setColumns(10);
 		
 		textField_Bank.setEditable(false);
-		textField_Bank.setBounds(1073, 557, 40, 20);
+		textField_Bank.setBounds(392, 559, 40, 20);
 		contentPane.add(textField_Bank);
 		textField_Bank.setColumns(10);
 		
 		JLabel lblBank = new JLabel("Bank");
-		lblBank.setBounds(977, 556, 46, 14);
+		lblBank.setBounds(336, 562, 62, 14);
 		contentPane.add(lblBank);
 		
 		JLabel lblStatus = new JLabel("Status");
-		lblStatus.setBounds(977, 594, 46, 14);
+		lblStatus.setBounds(336, 590, 46, 14);
 		contentPane.add(lblStatus);
 		
 		
 		textField_Status.setEditable(false);
-		textField_Status.setBounds(1073, 588, 40, 20);
+		textField_Status.setBounds(392, 587, 40, 20);
 		contentPane.add(textField_Status);
 		textField_Status.setColumns(10);
 		
 		JLabel lblDc = new JLabel("DC");
-		lblDc.setBounds(977, 623, 46, 14);
+		lblDc.setBounds(336, 618, 46, 14);
 		contentPane.add(lblDc);
 		
 		JLabel lblC = new JLabel("C");
-		lblC.setBounds(977, 648, 46, 14);
+		lblC.setBounds(336, 646, 62, 14);
 		contentPane.add(lblC);
 		
 		JLabel lblZ = new JLabel("Z");
-		lblZ.setBounds(977, 673, 46, 14);
+		lblZ.setBounds(336, 674, 46, 14);
 		contentPane.add(lblZ);
 		
 		textField_DC.setEditable(false);
-		textField_DC.setBounds(1073, 620, 40, 20);
+		textField_DC.setBounds(392, 615, 40, 20);
 		contentPane.add(textField_DC);
 		textField_DC.setColumns(10);
 		
 		textField_C.setEditable(false);
-		textField_C.setBounds(1073, 645, 40, 20);
+		textField_C.setBounds(392, 643, 40, 20);
 		contentPane.add(textField_C);
 		textField_C.setColumns(10);
 		
 		textField_Z.setEditable(false);
-		textField_Z.setBounds(1073, 670, 40, 20);
+		textField_Z.setBounds(392, 671, 40, 20);
 		contentPane.add(textField_Z);
 		textField_Z.setColumns(10);
 		
@@ -405,27 +412,38 @@ public class MainGUI extends JFrame{
 		contentPane.add(radioButtonPortBPin7);
 		
 		
-		scrollPane_2.setBounds(818, 530, 130, 171);
+		scrollPane_2.setBounds(499, 530, 130, 171);
 		contentPane.add(scrollPane_2);
 		scrollPane_2.setViewportView(stackList);
 		
 		JLabel lblPcl = new JLabel("PCL");
-		lblPcl.setBounds(977, 698, 46, 14);
+		lblPcl.setBounds(336, 702, 46, 14);
 		contentPane.add(lblPcl);
 		
 		textField_PCL.setEditable(false);
-		textField_PCL.setBounds(1073, 695, 40, 20);
+		textField_PCL.setBounds(392, 699, 40, 20);
 		contentPane.add(textField_PCL);
 		textField_PCL.setColumns(10);
 		
 		JLabel lblCycle = new JLabel("Cycle");
-		lblCycle.setBounds(977, 723, 46, 14);
+		lblCycle.setBounds(336, 730, 46, 14);
 		contentPane.add(lblCycle);
 		
 		textField_Cycle.setEditable(false);
-		textField_Cycle.setBounds(1073, 723, 40, 20);
+		textField_Cycle.setBounds(392, 727, 40, 20);
 		contentPane.add(textField_Cycle);
 		textField_Cycle.setColumns(10);
+		lblNewLabel.setBounds(237, 15, 46, 14);
+		
+		contentPane.add(lblNewLabel);
+		lblLaufzeit.setBounds(336, 506, 46, 14);
+		
+		contentPane.add(lblLaufzeit);
+		
+		contentPane.add(textField_Laufzeit);
+		lblStack.setBounds(499, 506, 46, 14);
+		
+		contentPane.add(lblStack);
 	}	
 	
 	/**Erstellt den "Datei öffnen"-Dialog, prüft ob eine Datei ausgewählt wurde und übergibt diese an die 

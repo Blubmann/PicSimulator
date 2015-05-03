@@ -6,10 +6,37 @@ import javax.swing.DefaultListModel;
 
 public class Register {
 	
+	/** Programmcounter des Simulators**/
 	private static int pc;
+	
+	/**Variable zum Speichern der Referenz für RB0**/
 	private static boolean bFlanke = false;
+	
+	/**Variable zum Speichern der Referenz für RB4:7**/
 	private static int refRB47Val = 0;
+	
+	/**Variable zum Speichern der Referenz für RA4**/
+	private static int refRA4Val = 0;
+	
+	/**Variable, ob Prescaler zu Watchdog gehört**/
+	private static boolean prescalertoWatchdog=true;
+	
+	/**Variable, ob Prescaler zu Timer0 gehört**/
+	private static boolean prescalertoTimer=false;
+	
+    private static boolean fallenEdgeOnRA4 = false;
+
+    private static boolean risingEdgeOnRA4 = false;
+
+	/**Speichern der Referenzfaktoren des Prescalers**/
+	private static int refPrescalerFactor =7;
+	
+	/**Variable die den aktuellen Prescalerwert enthält**/
+	private static int prescaler = 127;
+	
+	/**Variable zum Zählen der Cycles, um die LAufzeit zu berechnen**/
 	public static int cycleCounter;
+	
 	private Stack<Integer> stack = new Stack<Integer>();
 	
 	/**Häufig verwendete Adressen**/
@@ -287,6 +314,8 @@ public class Register {
 	
 	public void addCycle(){
 		cycleCounter++;
+		checkRA4Int();
+		increaseTimer0();
 	}
 	
 	/**Hält die Registerzellen fsr, status, pclath und intcon synchron**/
@@ -303,6 +332,9 @@ public class Register {
 		
 	}
 	
+	/**Methoden um bestimmte Bits im Intcon und Option 
+	 * Register zu prüfen
+	 */
 	public boolean get_GIE(){
 		if(activeBank==0){
 			return ((bank0[INTCON] & 128)==128);
@@ -351,8 +383,20 @@ public class Register {
 		}
 	}
 	
+	public boolean get_T0IF(){
+		if(activeBank==0){
+			return ((bank0[INTCON] & 4)==4);
+		}else{
+			return ((bank1[INTCON] & 4)==4);
+		}
+	}
+	
 	public boolean get_BINT(){
 		return((bank0[PORTB] & 1)==1);
+	}
+	
+	public int get_AInt(){
+		return (bank0[PORTA] & 16);
 	}
 	
 	public boolean get_INTEDG(){
@@ -363,16 +407,139 @@ public class Register {
 		return ((bank1[OPTION] & 32)==32);
 	}
 	
+	public boolean get_T0SE(){
+		return ((bank1[OPTION] & 16)==16);
+	}
+	
 	public boolean get_PSA(){
 		return ((bank1[OPTION] & 8)==8);
 	}
 	
+	public int get_PS(){
+		return (bank1[OPTION] & 7);
+	}
 	
+	/**Ruft die einzelnen Methoden zum Prüfen, ob
+	 * Interruptflags gesetzt werden müssen. Hinterher
+	 * werden die Flags geprüft
+	 */
 	public void checkInterrupt(){
 		checkRB0Int();
 		checkRB47Int();
 		checkInt();
 	}
+	
+	/**Methode zur Erhöhung des Timer0**/
+	public void increaseTimer0(){
+		checkPrescaler();
+		increaseTimer_Mode();
+	}
+	
+	/**Methode um den Timer0 entsprechend des gesetzten
+	 * Modus zu erhöhen
+	 */
+	public void increaseTimer_Mode(){
+		if(get_T0CS()){
+			increaseTimer_CounterMode();
+		}else{
+			increaseTimer_TimerMode();
+		}
+		checkTimer0Overflow();
+	}
+	
+	/**Methode um Timer0 im RA4-Modus zu erhöhen**/
+	public void increaseTimer_CounterMode(){
+		if(get_T0SE() && fallenEdgeOnRA4){
+			if(prescalertoTimer && prescaler !=0){
+				prescaler--;
+			}else{
+				if(prescalertoTimer && prescaler ==0){
+					bank0[TMR0]++;
+					setPrescaler();
+				}else{
+					bank0[TMR0]++;
+				}
+			}
+		}else if(!get_T0SE() && risingEdgeOnRA4){
+			if(prescalertoTimer && prescaler != 0){
+                prescaler--;
+            } else{
+                if(prescalertoTimer && prescaler == 0){
+                	bank0[TMR0]++;
+                    setPrescaler();
+                } else{
+                	bank0[TMR0]++;
+                }
+            }
+		}
+	}
+	
+	/**Methode um Timer0 im Timermodus zu erhöhen**/
+	public void increaseTimer_TimerMode(){
+		if(prescalertoTimer && prescaler !=0){
+			prescaler--;
+		}else{
+			if(prescalertoTimer && prescaler==0){
+				bank0[TMR0]++;
+				setPrescaler();
+			}else{
+				bank0[TMR0]++;
+			}
+		}
+	}
+	
+	/**Prüft, ob der Timer0 übergelaufen ist und setzt
+	 * entsprechend das T0IF-Bit
+	 */
+	public void checkTimer0Overflow(){
+		if(bank0[TMR0]>255){
+			bank0[TMR0]=0;
+			if(activeBank==0){
+				synchronizeBothBanks(INTCON, bank0[INTCON] | 4);
+			}else{
+				synchronizeBothBanks(INTCON, bank1[INTCON] | 4);
+			}
+			setPrescaler();
+		}
+	}
+	
+	/**Überprüft, wem der Prescaler zugeordnet ist**/
+	public void checkPrescaler(){
+		if(prescalertoWatchdog != get_PSA()){
+			setPrescaler();
+		}else if(refPrescalerFactor != get_PS()){
+			setPrescaler();
+		}
+	}
+	
+	/**Methode um den Prescaler zu setzen. Jenachdem 
+	 * ob er dem Timer oder dem Watchdog zugeordnet wird
+	 */
+	public void setPrescaler(){
+		if(get_PSA()){
+			setPrescalertoWatchdog();
+		}else{
+			setPrescalertoTimer();
+		}
+		refPrescalerFactor=get_PS();
+	}
+	
+	/**Initialisiert den Prescaler für den Watchdog**/
+	public void setPrescalertoWatchdog(){
+		int preFactor = get_PS();
+		prescaler = (int) Math.pow(2,preFactor) -1;
+		prescalertoWatchdog = true;
+		prescalertoTimer = false;
+	}
+	
+	/**Initialisiert den Prescaler für den Timer0**/
+	public void setPrescalertoTimer(){
+		int preFactor = get_PS();
+		prescaler = (int) Math.pow(2,preFactor+1) -1;
+		prescalertoWatchdog = false;
+		prescalertoTimer = true;
+	}
+	
 	
 	public void checkRB0Int(){
 		if((get_BINT() == get_INTEDG()) && (get_BINT() != (bFlanke==true))){
@@ -396,8 +563,25 @@ public class Register {
 		refRB47Val=bank0[INTCON]&240;
 	}
 	
+	public void checkRA4Int(){
+		if(refRA4Val > get_AInt()){
+			fallenEdgeOnRA4 = true;
+			risingEdgeOnRA4 = false;
+		}else if(refRA4Val<get_AInt()){
+			fallenEdgeOnRA4 = false;
+			risingEdgeOnRA4 = true;
+		}else{
+			fallenEdgeOnRA4 = false;
+			risingEdgeOnRA4 = false;
+		}
+		refRA4Val=get_AInt();
+	}
+	
 	public void checkInt(){
 		if(get_GIE()){
+			if(get_T0IE() && get_T0IF()){
+				handleInt();
+			}
 			if(get_INTE() && get_INTF()){
 				handleInt();
 			}
