@@ -11,7 +11,7 @@ public class ParDecInt extends Thread{
 		//System.out.println(instructions[0]);
 		//System.out.println("Test");
 		if(MainGUI.run==true){
-			for (i = 0; i <= (instructions.length - 1); i++) {
+			for (i = 0; i <= (instructions.length); i++) {
 				try {
 					i=reg.getPC();
 					decode(i);
@@ -19,7 +19,7 @@ public class ParDecInt extends Thread{
 					reg.setBank();
 					reg.refreshGUI();
 					reg.checkInterrupt();
-					sleep(MainGUI.slider.getValue());
+					sleep(1000000000/MainGUI.slider.getValue());
 					reg.readGui();
 					/**
 					System.out.println("Status 0: "+reg.getStatusReg(0));

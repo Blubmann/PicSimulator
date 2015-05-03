@@ -21,11 +21,14 @@ public class Register {
 	/**Variable, ob Prescaler zu Watchdog gehört**/
 	private static boolean prescalertoWatchdog=true;
 	
+	/**Initwert des Watchdog**/
+	public static int watchDog = 18000;
+	
 	/**Variable, ob Prescaler zu Timer0 gehört**/
 	private static boolean prescalertoTimer=false;
 	
+	/**Geben an on eine fallende oder steigende Flanke vorliegt**/
     private static boolean fallenEdgeOnRA4 = false;
-
     private static boolean risingEdgeOnRA4 = false;
 
 	/**Speichern der Referenzfaktoren des Prescalers**/
@@ -34,8 +37,9 @@ public class Register {
 	/**Variable die den aktuellen Prescalerwert enthält**/
 	private static int prescaler = 127;
 	
-	/**Variable zum Zählen der Cycles, um die LAufzeit zu berechnen**/
+	/**Variable zum Zählen der Cycles, um die Laufzeit zu berechnen**/
 	public static int cycleCounter;
+	public double runtime;
 	
 	private Stack<Integer> stack = new Stack<Integer>();
 	
@@ -79,8 +83,24 @@ public class Register {
 		this.wReg=0;
 		this.pc=0;
 		this.cycleCounter=0;
+		this.bank0[STATUS] = 24;
+		this.bank1[STATUS] = 24;
+		this.bank1[OPTION] = 255;
 		this.bank1[TRISA] = 31;
 		this.bank1[TRISB] = 255;
+	}
+	
+	public void reset(){
+		this.pc=0;
+		this.bank0[PCL]=pc;
+		this.bank1[PCL]=pc;
+		this.bank0[STATUS]=bank0[STATUS]&7;
+		this.bank1[STATUS]=bank1[STATUS]&7;
+		this.bank1[OPTION] = 255;
+		this.bank0[PCLATH] = 0;
+		this.bank1[PCLATH] = 0;
+		this.bank0[INTCON] = bank0[INTCON]&1;
+		this.bank1[INTCON] = bank1[INTCON]&1;
 	}
 	
 	/**Speichert den PC für den Folgebefehl nach z.B. einem Call**/
@@ -157,7 +177,9 @@ public class Register {
 		MainGUI.textField_DC.setText(Integer.toHexString(getStatusReg(1)));
 		MainGUI.textField_PCL.setText(Integer.toHexString(bank0[PCL]));
 		MainGUI.textField_Cycle.setText(Integer.toString(cycleCounter));
-
+		MainGUI.textField_Watchdog.setText(Integer.toString(watchDog));
+		MainGUI.textField_Frequenz.setText(Integer.toString(MainGUI.slider.getValue()));
+		MainGUI.textField_Laufzeit.setText(Double.toString(getRuntime()));
 	}
 	
 	/**Ruft die Methoden zum Lesen der Radiobuttons für die PortPins auf**/
@@ -314,10 +336,15 @@ public class Register {
 	
 	public void addCycle(){
 		cycleCounter++;
+		this.runtime = runtime + (4000000/MainGUI.slider.getValue());
 		checkRA4Int();
 		increaseTimer0();
+		decreaseWDT();
 	}
 	
+	public double getRuntime(){
+		return this.runtime;
+	}
 	/**Hält die Registerzellen fsr, status, pclath und intcon synchron**/
 	public void synchronizeBothBanks(int f, int val) {
         if (f == FSR || f == STATUS || f == PCLATH || f == INTCON) {
@@ -540,7 +567,30 @@ public class Register {
 		prescalertoTimer = true;
 	}
 	
+	public void decreaseWDT(){
+		if(MainGUI.getWatchdogEnable()){
+			checkPrescaler();
+			if(prescalertoWatchdog && prescaler !=0){
+				prescaler--;
+			}else{
+				if(prescalertoWatchdog && prescaler ==0){
+					watchDog--;
+					setPrescaler();
+				}else{
+					watchDog--;
+				}
+				checkWDTReset();
+			}
+		}
+	}
 	
+	public void checkWDTReset(){
+		if(watchDog==0){
+			watchDog=18000;
+			setPrescaler();
+			refreshGUI();
+		}
+	}
 	public void checkRB0Int(){
 		if((get_BINT() == get_INTEDG()) && (get_BINT() != (bFlanke==true))){
 			if(activeBank==0){

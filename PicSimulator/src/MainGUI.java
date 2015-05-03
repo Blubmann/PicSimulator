@@ -52,7 +52,7 @@ public class MainGUI extends JFrame{
 	public static JScrollPane scrollPane_1 = new JScrollPane();
 	public static JScrollPane scrollPane_2 = new JScrollPane();
 	public static JList stackList = new JList();
-	public static JSlider slider = new JSlider(0,1000,500);
+	public static JSlider slider = new JSlider(1000000,80000000,40000000);
 	public static JTextField textField_WReg = new JTextField();
 	public static JTextField textField_Bank = new JTextField();
 	public static JTextField textField_Status = new JTextField();
@@ -61,6 +61,9 @@ public class MainGUI extends JFrame{
 	public static JTextField textField_Z = new JTextField();
 	public static JTextField textField_PCL = new JTextField();
 	public static JTextField textField_Cycle = new JTextField();
+	public static JTextField textField_Laufzeit = new JTextField();
+	public static JTextField textField_Watchdog = new JTextField();
+	public static JTextField textField_Frequenz = new JTextField();
 	static JRadioButton radioButtonPortAPin0 = new JRadioButton("");
 	static JRadioButton radioButtonPortAPin1 = new JRadioButton("");
 	static JRadioButton radioButtonPortAPin2 = new JRadioButton("");
@@ -87,14 +90,15 @@ public class MainGUI extends JFrame{
 	static JRadioButton radioButtonPortBTris2 = new JRadioButton("");
 	static JRadioButton radioButtonPortBTris1 = new JRadioButton("");
 	static JRadioButton radioButtonPortBTris0 = new JRadioButton("");
+	static JRadioButton radioButton_Watchdog = new JRadioButton("");
 	private Boolean checkbox;
 	public static boolean bank=true;
 	public static boolean run;
 	public static boolean step;
-	private final JLabel lblNewLabel = new JLabel("Frequenz");
+	private final JLabel lblFrequenz = new JLabel("Frequenz");
 	private final JLabel lblLaufzeit = new JLabel("Laufzeit");
-	private final JTextField textField_Laufzeit = new JTextField();
 	private final JLabel lblStack = new JLabel("Stack");
+	private final JLabel lblWatchdog = new JLabel("Watchdog");
 	/**
 	 * Launch the application.
 	 */
@@ -115,6 +119,12 @@ public class MainGUI extends JFrame{
 	 * Create the frame.
 	 */
 	public MainGUI() {
+		textField_Frequenz.setEditable(false);
+		textField_Frequenz.setBounds(296, 12, 46, 20);
+		textField_Frequenz.setColumns(10);
+		textField_Watchdog.setEditable(false);
+		textField_Watchdog.setBounds(592, 727, 86, 20);
+		textField_Watchdog.setColumns(10);
 		textField_Laufzeit.setEditable(false);
 		textField_Laufzeit.setBounds(392, 503, 86, 20);
 		textField_Laufzeit.setColumns(10);
@@ -433,17 +443,24 @@ public class MainGUI extends JFrame{
 		textField_Cycle.setBounds(392, 727, 40, 20);
 		contentPane.add(textField_Cycle);
 		textField_Cycle.setColumns(10);
-		lblNewLabel.setBounds(237, 15, 46, 14);
+		lblFrequenz.setBounds(237, 15, 46, 14);
 		
-		contentPane.add(lblNewLabel);
+		contentPane.add(lblFrequenz);
 		lblLaufzeit.setBounds(336, 506, 46, 14);
 		
 		contentPane.add(lblLaufzeit);
-		
 		contentPane.add(textField_Laufzeit);
 		lblStack.setBounds(499, 506, 46, 14);
 		
 		contentPane.add(lblStack);
+		lblWatchdog.setBounds(499, 730, 62, 14);
+		
+		contentPane.add(lblWatchdog);
+		contentPane.add(textField_Watchdog);
+		radioButton_Watchdog.setBounds(565, 725, 21, 23);
+		contentPane.add(radioButton_Watchdog);
+		
+		contentPane.add(textField_Frequenz);
 	}	
 	
 	/**Erstellt den "Datei öffnen"-Dialog, prüft ob eine Datei ausgewählt wurde und übergibt diese an die 
@@ -529,6 +546,14 @@ public class MainGUI extends JFrame{
             System.out.println("Es ist ein Fehler beim lesen der Datei aufgetreten");
             e.printStackTrace();
         }
+	}
+	
+	public static boolean getWatchdogEnable(){
+		if(radioButton_Watchdog.isSelected()==true){
+			return true;
+		}else{
+			return false;
+		}
 	}
 	
 	/**Folgende Methoden lesen die gesetzten Radiobuttons aus, 

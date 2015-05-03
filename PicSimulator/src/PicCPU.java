@@ -346,7 +346,9 @@ public class PicCPU {
 	}
 	
 	public void clrwdt(){
-		//TODO
+		ParDecInt.reg.watchDog=18000;
+		ParDecInt.reg.setStatusReg(3, 1);
+		ParDecInt.reg.setStatusReg(4, 1);
 		ParDecInt.reg.addCycle();
 		ParDecInt.reg.increasePC();
 	}
@@ -396,7 +398,9 @@ public class PicCPU {
 	}
 		
 	public void sleep(){
-		//TODO		
+		ParDecInt.reg.watchDog=18000;
+		ParDecInt.reg.setStatusReg(3, 1);
+		ParDecInt.reg.setStatusReg(4, 1);	
 		ParDecInt.reg.increasePC();
 		ParDecInt.reg.addCycle();
 	}
