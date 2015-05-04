@@ -44,10 +44,10 @@ import javax.swing.JRadioButton;
 public class MainGUI extends JFrame{
 
 	private JPanel contentPane;
-	private JButton btnStart;
 	public ParDecInt pardecint;
 	private CodeTable codetab;
 	public static RegTable regtab;
+    private static ComPort comPort;
 	public static JScrollPane scrollPane = new JScrollPane();
 	public static JScrollPane scrollPane_1 = new JScrollPane();
 	public static JScrollPane scrollPane_2 = new JScrollPane();
@@ -95,6 +95,10 @@ public class MainGUI extends JFrame{
 	public static boolean bank=true;
 	public static boolean run;
 	public static boolean step;
+	public static boolean comPortEnable=false;
+	private JButton btnStart = new JButton("Start");
+	private JButton btnStepbystep = new JButton("Step-by-Step");
+	private static JButton btnConnect = new JButton("Connect");
 	private final JLabel lblFrequenz = new JLabel("Frequenz");
 	private final JLabel lblLaufzeit = new JLabel("Laufzeit");
 	private final JLabel lblStack = new JLabel("Stack");
@@ -156,14 +160,24 @@ public class MainGUI extends JFrame{
 		setContentPane(contentPane);
 		contentPane.setLayout(null);
 		
-		btnStart = new JButton("Start");
 		btnStart.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent ev) {
-				run= true;
-				step =false;
-		        btnStart.setEnabled(false);
-		        ParDecInt pardecintThread = new ParDecInt();
-		        pardecintThread.start(); 
+				if(run==false){
+					run= true;
+					step =false;
+					btnStart.setEnabled(false);
+					ParDecInt pardecintThread = new ParDecInt();
+					pardecintThread.start(); 
+					btnStart.setText("Stop");
+					btnStart.setEnabled(true);
+					btnStepbystep.setEnabled(false);
+				}else if(run==true){
+					run= false;
+					btnStart.setText("Start");
+					btnStart.setEnabled(true);
+					btnStepbystep.setEnabled(true);
+				}
+				
 		        //System.out.println("Test");
 			}
 		});
@@ -199,7 +213,6 @@ public class MainGUI extends JFrame{
 		button.setBounds(110, 71, 89, 23);
 		contentPane.add(button);
 		
-		JButton btnStepbystep = new JButton("Step-by-Step");
 		btnStepbystep.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
 				run= false;
@@ -293,14 +306,17 @@ public class MainGUI extends JFrame{
 		radioButtonPortATris0.setBounds(110, 719, 21, 23);
 		contentPane.add(radioButtonPortATris0);
 		
-		JButton btnTestbutton = new JButton("Testbutton");
-		btnTestbutton.addActionListener(new ActionListener() {
+		btnConnect.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent arg0) {
-				ParDecInt.reg.setRegister0(6, 1);
+				if(!comPortEnable){
+					ComPortConnector commy = new ComPortConnector();
+				}else{
+					disconnectComPort();
+				}
 			}
 		});
-		btnTestbutton.setBounds(243, 71, 89, 23);
-		contentPane.add(btnTestbutton);
+		btnConnect.setBounds(243, 71, 89, 23);
+		contentPane.add(btnConnect);
 		
 		JLabel lblWregister = new JLabel("W");
 		lblWregister.setBounds(336, 534, 62, 14);
@@ -656,6 +672,9 @@ public class MainGUI extends JFrame{
         } else {
         	radioButtonPortATris4.setSelected(false);
         }
+        if(comPortEnable){
+        	comPort.updatePortA(ParDecInt.reg.bank1[ParDecInt.reg.TRISA]);
+        }
 	}
 	
 	public static int getPinsPortB(){
@@ -803,7 +822,30 @@ public class MainGUI extends JFrame{
         } else {
         	radioButtonPortBTris7.setSelected(false);
         }
+        if(comPortEnable){
+        	comPort.updatePortB(ParDecInt.reg.bank1[ParDecInt.reg.TRISB]);
+        }
 	}
+	
+	public static void connectComPort(String comPortName){
+		comPort = new ComPort(ParDecInt.reg.bank0[ParDecInt.reg.TRISA], ParDecInt.reg.bank0[ParDecInt.reg.PORTA],ParDecInt.reg.bank0[ParDecInt.reg.TRISB],ParDecInt.reg.bank0[ParDecInt.reg.PORTB]);
+		try{
+			comPort.connect(comPortName);
+			comPortEnable= true;
+			btnConnect.setText("Disconnect");
+			btnConnect.setEnabled(true);
+		}catch(Exception e){
+			e.printStackTrace();
+		}
+	}
+	
+	public static void disconnectComPort(){
+        comPort.close();
+        btnConnect.setText("Connect");
+		btnConnect.setEnabled(true);
+        comPortEnable = false;
+    }
+	
 	private static void addPopup(Component component, final JPopupMenu popup) {
 		component.addMouseListener(new MouseAdapter() {
 			public void mousePressed(MouseEvent e) {

@@ -12,6 +12,9 @@ public class ParDecInt extends Thread{
 		//System.out.println("Test");
 		if(MainGUI.run==true){
 			for (i = 0; i <= (instructions.length); i++) {
+				if(MainGUI.run==false){
+					break;
+				}
 				try {
 					i=reg.getPC();
 					decode(i);
@@ -48,9 +51,9 @@ public class ParDecInt extends Thread{
 				decode(i);
 				reg.setBank();
 				reg.statusToMemory();
-				MainGUI.regtab.updateTable0(MainGUI.scrollPane_1);
-				System.out.println("PCL: "+reg.getPC());
-				System.out.println("W-Register: "+reg.getWReg());
+				reg.refreshGUI();
+				reg.checkInterrupt();
+				reg.readGui();
 				MainGUI.step=false;
 		}
 		//reg.printRegister();
