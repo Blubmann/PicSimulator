@@ -80,13 +80,18 @@ public class ParDecInt extends Thread{
 		this.code = icode;
 		int CodeCount = 0;		
 		int[] newInst = new int[this.code.length]; 
+		int[] newLineNumber = new int[this.code.length];
 		
 		for(String singleLines : code){			
 			int opcodeInt;
+			int lineInt;
 			String opcode = singleLines.substring(5, 9);
+			String LineNumber = singleLines.substring(20, 25);
 			opcodeInt = Integer.parseInt(opcode, 16);
+			lineInt = Integer.parseInt(LineNumber, 16);
 			System.out.println("Dezimaler Befehlscode "+opcodeInt);
 			newInst[CodeCount] = opcodeInt;
+			newLineNumber[CodeCount] = lineInt;
 			CodeCount++;
 		}
 		instructions=newInst;
