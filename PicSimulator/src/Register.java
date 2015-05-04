@@ -180,6 +180,7 @@ public class Register {
 		MainGUI.textField_Watchdog.setText(Integer.toString(watchDog));
 		MainGUI.textField_Frequenz.setText(Integer.toString(MainGUI.slider.getValue()));
 		MainGUI.textField_Laufzeit.setText(Double.toString(getRuntime()));
+		//TODO Bug, da die Laufzeit bei größeren Quarzfrequenzen nicht angezeigt wird
 	}
 	
 	/**Ruft die Methoden zum Lesen der Radiobuttons für die PortPins auf**/

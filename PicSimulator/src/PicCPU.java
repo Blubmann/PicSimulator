@@ -476,7 +476,7 @@ public class PicCPU {
 	}
 	
 	private void setDCFlag(int val){
-		if(val<16){
+		if(val<15){
 			ParDecInt.reg.setStatusReg(ParDecInt.reg.DCFLAG, 0);
 		}else{
 			ParDecInt.reg.setStatusReg(ParDecInt.reg.DCFLAG, 1);
