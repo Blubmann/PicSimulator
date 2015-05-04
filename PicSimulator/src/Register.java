@@ -644,7 +644,8 @@ public class Register {
 	
 	public void handleInt(){
 		synchronizeBothBanks(INTCON, 127);
-		ParDecInt.cpu.call(4);
+		pushPCtoStack();
+		synchronizeBothBanks(PCL,4);
 	}
 	
 	public void setPC(int actualPC){

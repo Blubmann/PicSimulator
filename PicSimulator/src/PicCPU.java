@@ -14,7 +14,7 @@ public class PicCPU {
 		setDCFlag(dc);
 		setCFlag(buf);
 		setZFlag(buf);
-		buf = valbigger255(buf);
+		buf = buf&0b11111111;
 		checkDandInsert(buf,f,d);
 		ParDecInt.reg.increasePC();
 		ParDecInt.reg.addCycle();
@@ -25,7 +25,6 @@ public class PicCPU {
 		int w = ParDecInt.reg.getWReg();
 		int buf = getValFromBank(f)&w;
 		setZFlag(buf);
-		buf = valbigger255(buf);
 		checkDandInsert(buf,f,d);
 		ParDecInt.reg.increasePC();
 		ParDecInt.reg.addCycle();
