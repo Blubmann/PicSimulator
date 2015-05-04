@@ -1,27 +1,41 @@
-import javax.swing.plaf.SliderUI;
-
-
 public class ParDecInt extends Thread{
 	public String[] code;
 	public static int[] instructions;
 	private Thread t;
 	private int i=0;
-	private static PicCPU cpu = new PicCPU();
+	public static PicCPU cpu = new PicCPU();
 	public static Register reg = new Register();
 	
+	/** Es wird geprüft(anhand des Run-/Step-Flags), ob alle Befehle ausgeführt werden oder nur einer **/
 	public void run(){
 		//System.out.println(instructions[0]);
 		//System.out.println("Test");
 		if(MainGUI.run==true){
-			for (i = 0; i <= (instructions.length - 1); i++) {
+			for (i = 0; i <= (instructions.length); i++) {
 				try {
-					sleep(MainGUI.slider.getValue());
-					reg.setBank();
-					reg.statusToMemory();
 					i=reg.getPC();
 					decode(i);
+					reg.statusToMemory();
+					reg.setBank();
+					reg.refreshGUI();
+					reg.checkInterrupt();
+					sleep(1000000000/MainGUI.slider.getValue());
 					reg.readGui();
-					reg.setGui();
+					/**
+					System.out.println("Status 0: "+reg.getStatusReg(0));
+					System.out.println("Status 1: "+reg.getStatusReg(1));
+					System.out.println("Status 2: "+reg.getStatusReg(2));
+					System.out.println("Status 3: "+reg.getStatusReg(3));
+					System.out.println("Status 4: "+reg.getStatusReg(4));
+					System.out.println("Status 5: "+reg.getStatusReg(5));
+					System.out.println("Status 6: "+reg.getStatusReg(6));
+					System.out.println("Status 7: "+reg.getStatusReg(7));
+					System.out.println("Status: "+reg.bank0[3]);
+					System.out.println("Aktive Bank: "+reg.activeBank);
+					System.out.println("PortA: "+reg.getRegister0(5));
+					System.out.println("PortB: "+reg.getRegister0(6));
+					**/
+
 				} catch (InterruptedException e) {
 					// TODO Auto-generated catch block
 					e.printStackTrace();
@@ -42,10 +56,12 @@ public class ParDecInt extends Thread{
 		//reg.printRegister();
 	}
 	
+	/** Beim betätigen der Buttons Start/Step wird ein Thread gestartet. Das ist wichtig, damit sich die Gui 
+	 *während der Codeinterpretation nicht aufhängt
+	 */
     public void start (){
 	      //System.out.println("Starting");
-	      if (t == null)
-	      {
+	      if (t == null){
 	         t = new Thread (this);
 	         t.start ();
 	      }

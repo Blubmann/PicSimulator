@@ -50,26 +50,55 @@ public class MainGUI extends JFrame{
 	public static RegTable regtab;
 	public static JScrollPane scrollPane = new JScrollPane();
 	public static JScrollPane scrollPane_1 = new JScrollPane();
-	public static JSlider slider = new JSlider(0,1000,500);
-	public static JTextField textField = new JTextField();
-	public static JTextField textField_1 = new JTextField();
+	public static JScrollPane scrollPane_2 = new JScrollPane();
+	public static JList stackList = new JList();
+	public static JSlider slider = new JSlider(1000000,80000000,40000000);
+	public static JTextField textField_WReg = new JTextField();
+	public static JTextField textField_Bank = new JTextField();
+	public static JTextField textField_Status = new JTextField();
+	public static JTextField textField_DC = new JTextField();
+	public static JTextField textField_C = new JTextField();
+	public static JTextField textField_Z = new JTextField();
+	public static JTextField textField_PCL = new JTextField();
+	public static JTextField textField_Cycle = new JTextField();
+	public static JTextField textField_Laufzeit = new JTextField();
+	public static JTextField textField_Watchdog = new JTextField();
+	public static JTextField textField_Frequenz = new JTextField();
 	static JRadioButton radioButtonPortAPin0 = new JRadioButton("");
 	static JRadioButton radioButtonPortAPin1 = new JRadioButton("");
 	static JRadioButton radioButtonPortAPin2 = new JRadioButton("");
 	static JRadioButton radioButtonPortAPin3 = new JRadioButton("");
 	static JRadioButton radioButtonPortAPin4 = new JRadioButton("");
-	JRadioButton radioButtonPortATris7 = new JRadioButton("");
-	JRadioButton radioButtonPortATris6 = new JRadioButton("");
-	JRadioButton radioButtonPortATris5 = new JRadioButton("");
-	JRadioButton radioButtonPortATris4 = new JRadioButton("");
-	JRadioButton radioButtonPortATris3 = new JRadioButton("");
-	JRadioButton radioButtonPortATris2 = new JRadioButton("");
-	JRadioButton radioButtonPortATris1 = new JRadioButton("");
-	JRadioButton radioButtonPortATris0 = new JRadioButton("");
+	static JRadioButton radioButtonPortBPin0 = new JRadioButton("");
+	static JRadioButton radioButtonPortBPin1 = new JRadioButton("");
+	static JRadioButton radioButtonPortBPin2 = new JRadioButton("");
+	static JRadioButton radioButtonPortBPin3 = new JRadioButton("");
+	static JRadioButton radioButtonPortBPin4 = new JRadioButton("");
+	static JRadioButton radioButtonPortBPin5 = new JRadioButton("");
+	static JRadioButton radioButtonPortBPin6 = new JRadioButton("");
+	static JRadioButton radioButtonPortBPin7 = new JRadioButton("");
+	static JRadioButton radioButtonPortATris4 = new JRadioButton("");
+	static JRadioButton radioButtonPortATris3 = new JRadioButton("");
+	static JRadioButton radioButtonPortATris2 = new JRadioButton("");
+	static JRadioButton radioButtonPortATris1 = new JRadioButton("");
+	static JRadioButton radioButtonPortATris0 = new JRadioButton("");
+	static JRadioButton radioButtonPortBTris7 = new JRadioButton("");
+	static JRadioButton radioButtonPortBTris6 = new JRadioButton("");
+	static JRadioButton radioButtonPortBTris5 = new JRadioButton("");
+	static JRadioButton radioButtonPortBTris4 = new JRadioButton("");
+	static JRadioButton radioButtonPortBTris3 = new JRadioButton("");
+	static JRadioButton radioButtonPortBTris2 = new JRadioButton("");
+	static JRadioButton radioButtonPortBTris1 = new JRadioButton("");
+	static JRadioButton radioButtonPortBTris0 = new JRadioButton("");
+	static JRadioButton radioButton_Watchdog = new JRadioButton("");
 	private Boolean checkbox;
+	public static boolean bank=true;
 	public static boolean run;
 	public static boolean step;
-
+	private final JLabel lblFrequenz = new JLabel("Frequenz");
+	private final JLabel lblLaufzeit = new JLabel("Laufzeit");
+	private final JLabel lblStack = new JLabel("Stack");
+	private final JLabel lblWatchdog = new JLabel("Watchdog");
 	/**
 	 * Launch the application.
 	 */
@@ -90,6 +119,15 @@ public class MainGUI extends JFrame{
 	 * Create the frame.
 	 */
 	public MainGUI() {
+		textField_Frequenz.setEditable(false);
+		textField_Frequenz.setBounds(296, 12, 46, 20);
+		textField_Frequenz.setColumns(10);
+		textField_Watchdog.setEditable(false);
+		textField_Watchdog.setBounds(592, 727, 86, 20);
+		textField_Watchdog.setColumns(10);
+		textField_Laufzeit.setEditable(false);
+		textField_Laufzeit.setBounds(392, 503, 86, 20);
+		textField_Laufzeit.setColumns(10);
 		setTitle("Pic");
 		setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
 		setBounds(100, 100, 1156, 825);
@@ -144,6 +182,7 @@ public class MainGUI extends JFrame{
 		JButton btnBank = new JButton("Bank0");
 		btnBank.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent arg0) {
+				bank=true;
 				regtab.updateTable0(scrollPane_1);
 			}
 		});
@@ -153,6 +192,7 @@ public class MainGUI extends JFrame{
 		JButton button = new JButton("Bank1");
 		button.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
+				bank=false;
 				regtab.updateTable1(scrollPane_1);
 			}
 		});
@@ -171,7 +211,7 @@ public class MainGUI extends JFrame{
 		btnStepbystep.setBounds(98, 11, 101, 23);
 		contentPane.add(btnStepbystep);
 		
-		slider.setBounds(237, 11, 95, 23);
+		slider.setBounds(237, 37, 95, 23);
 		contentPane.add(slider);
 		
 		JLabel lblPortA = new JLabel("Port A");
@@ -232,28 +272,23 @@ public class MainGUI extends JFrame{
 		
 		radioButtonPortAPin0.setBounds(62, 719, 21, 23);
 		contentPane.add(radioButtonPortAPin0);
-		
-		radioButtonPortATris7.setEnabled(false);
-		radioButtonPortATris7.setBounds(110, 547, 21, 23);
-		contentPane.add(radioButtonPortATris7);
-		
-		radioButtonPortATris6.setBounds(110, 573, 21, 23);
-		contentPane.add(radioButtonPortATris6);
-		
-		radioButtonPortATris5.setBounds(110, 594, 21, 23);
-		contentPane.add(radioButtonPortATris5);
+		radioButtonPortATris4.setEnabled(false);
 		
 		radioButtonPortATris4.setBounds(110, 619, 21, 23);
 		contentPane.add(radioButtonPortATris4);
+		radioButtonPortATris3.setEnabled(false);
 		
 		radioButtonPortATris3.setBounds(110, 644, 21, 23);
 		contentPane.add(radioButtonPortATris3);
+		radioButtonPortATris2.setEnabled(false);
 		
 		radioButtonPortATris2.setBounds(110, 669, 21, 23);
 		contentPane.add(radioButtonPortATris2);
+		radioButtonPortATris1.setEnabled(false);
 		
 		radioButtonPortATris1.setBounds(110, 694, 21, 23);
 		contentPane.add(radioButtonPortATris1);
+		radioButtonPortATris0.setEnabled(false);
 		
 		radioButtonPortATris0.setBounds(110, 719, 21, 23);
 		contentPane.add(radioButtonPortATris0);
@@ -267,27 +302,170 @@ public class MainGUI extends JFrame{
 		btnTestbutton.setBounds(243, 71, 89, 23);
 		contentPane.add(btnTestbutton);
 		
-		JLabel lblWregister = new JLabel("W-Register");
-		lblWregister.setBounds(994, 532, 62, 14);
+		JLabel lblWregister = new JLabel("W");
+		lblWregister.setBounds(336, 534, 62, 14);
 		contentPane.add(lblWregister);
 		
 		
-		textField.setEditable(false);
-		textField.setBounds(1073, 529, 40, 20);
-		contentPane.add(textField);
-		textField.setColumns(10);
+		textField_WReg.setEditable(false);
+		textField_WReg.setBounds(392, 531, 40, 20);
+		contentPane.add(textField_WReg);
+		textField_WReg.setColumns(10);
 		
-		textField_1.setEditable(false);
-		textField_1.setBounds(1073, 557, 40, 20);
-		contentPane.add(textField_1);
-		textField_1.setColumns(10);
+		textField_Bank.setEditable(false);
+		textField_Bank.setBounds(392, 559, 40, 20);
+		contentPane.add(textField_Bank);
+		textField_Bank.setColumns(10);
 		
 		JLabel lblBank = new JLabel("Bank");
-		lblBank.setBounds(994, 557, 46, 14);
+		lblBank.setBounds(336, 562, 62, 14);
 		contentPane.add(lblBank);
 		
+		JLabel lblStatus = new JLabel("Status");
+		lblStatus.setBounds(336, 590, 46, 14);
+		contentPane.add(lblStatus);
+		
+		
+		textField_Status.setEditable(false);
+		textField_Status.setBounds(392, 587, 40, 20);
+		contentPane.add(textField_Status);
+		textField_Status.setColumns(10);
+		
+		JLabel lblDc = new JLabel("DC");
+		lblDc.setBounds(336, 618, 46, 14);
+		contentPane.add(lblDc);
+		
+		JLabel lblC = new JLabel("C");
+		lblC.setBounds(336, 646, 62, 14);
+		contentPane.add(lblC);
+		
+		JLabel lblZ = new JLabel("Z");
+		lblZ.setBounds(336, 674, 46, 14);
+		contentPane.add(lblZ);
+		
+		textField_DC.setEditable(false);
+		textField_DC.setBounds(392, 615, 40, 20);
+		contentPane.add(textField_DC);
+		textField_DC.setColumns(10);
+		
+		textField_C.setEditable(false);
+		textField_C.setBounds(392, 643, 40, 20);
+		contentPane.add(textField_C);
+		textField_C.setColumns(10);
+		
+		textField_Z.setEditable(false);
+		textField_Z.setBounds(392, 671, 40, 20);
+		contentPane.add(textField_Z);
+		textField_Z.setColumns(10);
+		
+		JLabel lblPortB = new JLabel("Port B");
+		lblPortB.setBounds(166, 532, 46, 14);
+		contentPane.add(lblPortB);
+		
+		JLabel label_9 = new JLabel("Tris");
+		label_9.setBounds(214, 532, 46, 14);
+		contentPane.add(label_9);
+		
+		radioButtonPortBTris7.setEnabled(false);
+		radioButtonPortBTris7.setBounds(214, 547, 21, 23);
+		contentPane.add(radioButtonPortBTris7);
+		
+		radioButtonPortBTris6.setEnabled(false);
+		radioButtonPortBTris6.setBounds(214, 573, 21, 23);
+		contentPane.add(radioButtonPortBTris6);
+		
+		radioButtonPortBTris5.setEnabled(false);
+		radioButtonPortBTris5.setBounds(214, 594, 21, 23);
+		contentPane.add(radioButtonPortBTris5);
+		
+		radioButtonPortBTris4.setEnabled(false);
+		radioButtonPortBTris4.setBounds(214, 619, 21, 23);
+		contentPane.add(radioButtonPortBTris4);
+		
+		radioButtonPortBTris3.setEnabled(false);
+		radioButtonPortBTris3.setBounds(214, 644, 21, 23);
+		contentPane.add(radioButtonPortBTris3);
+		
+		radioButtonPortBTris2.setEnabled(false);
+		radioButtonPortBTris2.setBounds(214, 669, 21, 23);
+		contentPane.add(radioButtonPortBTris2);
+		
+		radioButtonPortBTris1.setEnabled(false);
+		radioButtonPortBTris1.setBounds(214, 694, 21, 23);
+		contentPane.add(radioButtonPortBTris1);
+		radioButtonPortBTris0.setEnabled(false);
+		radioButtonPortBTris0.setBounds(214, 719, 21, 23);
+		contentPane.add(radioButtonPortBTris0);
+		
+		radioButtonPortBPin0.setBounds(166, 719, 21, 23);
+		contentPane.add(radioButtonPortBPin0);
+		
+		radioButtonPortBPin1.setBounds(166, 694, 21, 23);
+		contentPane.add(radioButtonPortBPin1);
+		
+		radioButtonPortBPin2.setBounds(166, 669, 21, 23);
+		contentPane.add(radioButtonPortBPin2);
+		
+		radioButtonPortBPin3.setBounds(166, 644, 21, 23);
+		contentPane.add(radioButtonPortBPin3);
+		
+		radioButtonPortBPin4.setBounds(166, 619, 21, 23);
+		contentPane.add(radioButtonPortBPin4);
+		
+		radioButtonPortBPin5.setBounds(166, 594, 21, 23);
+		contentPane.add(radioButtonPortBPin5);
+		
+		radioButtonPortBPin6.setBounds(166, 569, 21, 23);
+		contentPane.add(radioButtonPortBPin6);
+		
+		radioButtonPortBPin7.setBounds(166, 544, 21, 23);
+		contentPane.add(radioButtonPortBPin7);
+		
+		
+		scrollPane_2.setBounds(499, 530, 130, 171);
+		contentPane.add(scrollPane_2);
+		scrollPane_2.setViewportView(stackList);
+		
+		JLabel lblPcl = new JLabel("PCL");
+		lblPcl.setBounds(336, 702, 46, 14);
+		contentPane.add(lblPcl);
+		
+		textField_PCL.setEditable(false);
+		textField_PCL.setBounds(392, 699, 40, 20);
+		contentPane.add(textField_PCL);
+		textField_PCL.setColumns(10);
+		
+		JLabel lblCycle = new JLabel("Cycle");
+		lblCycle.setBounds(336, 730, 46, 14);
+		contentPane.add(lblCycle);
+		
+		textField_Cycle.setEditable(false);
+		textField_Cycle.setBounds(392, 727, 40, 20);
+		contentPane.add(textField_Cycle);
+		textField_Cycle.setColumns(10);
+		lblFrequenz.setBounds(237, 15, 46, 14);
+		
+		contentPane.add(lblFrequenz);
+		lblLaufzeit.setBounds(336, 506, 46, 14);
+		
+		contentPane.add(lblLaufzeit);
+		contentPane.add(textField_Laufzeit);
+		lblStack.setBounds(499, 506, 46, 14);
+		
+		contentPane.add(lblStack);
+		lblWatchdog.setBounds(499, 730, 62, 14);
+		
+		contentPane.add(lblWatchdog);
+		contentPane.add(textField_Watchdog);
+		radioButton_Watchdog.setBounds(565, 725, 21, 23);
+		contentPane.add(radioButton_Watchdog);
+		
+		contentPane.add(textField_Frequenz);
 	}	
 	
+	/**Erstellt den "Datei öffnen"-Dialog, prüft ob eine Datei ausgewählt wurde und übergibt diese an die 
+	 * Methode readandwrite()
+	 */
 	public void openclicked() {
 		File file =null;
 		/** Öffnen des Dialogs für die Auswahl der Datei**/
@@ -308,7 +486,10 @@ public class MainGUI extends JFrame{
         	System.out.println("JFileChooser canceled");
         }
 	}
-		
+	
+	/**readandwrite ließt die Datei zeilenweise aus, filtert die relevanten Codezeilen heraus und übergibt diese 
+	 * an die Klasse ParDecInt. Außerdem werden alle Codezeilen in die Codetabelle geschrieben.
+	 */
 	private void readandwrite(File file){
 		String[] Buffer; //Buffer für Programmcode
 		int j= 0;
@@ -367,16 +548,22 @@ public class MainGUI extends JFrame{
         }
 	}
 	
-	public void setTrisPortA(){
-		
+	public static boolean getWatchdogEnable(){
+		if(radioButton_Watchdog.isSelected()==true){
+			return true;
+		}else{
+			return false;
+		}
 	}
 	
+	/**Folgende Methoden lesen die gesetzten Radiobuttons aus, 
+	 * bzw. holen sich den aktuellen Registerinhalt und setzen die Radobuttons entsprechend
+	 */
 	public static int getPinsPortA(){
 		int buf[] = new int[5];
 		int buffer=0;
 		if(radioButtonPortAPin0.isSelected()==true){
 			buf[0]=1;
-			System.out.println("Pin0 Port A ist aktiv");
 		}else{
 			buf[0]=0;
 		}
@@ -407,51 +594,216 @@ public class MainGUI extends JFrame{
 		return buffer;
 	}
 	
-	public int[] getTrisPortA(){
-		int buf[] = new int[5];
-		if(radioButtonPortATris0.isSelected()==true){
+	 public static void setPinsPortA() {
+        int[] port = ParDecInt.reg.getPortA();
+
+        if (port[0] == 1) {
+            radioButtonPortAPin0.setSelected(true);
+        } else {
+        	radioButtonPortAPin0.setSelected(false);
+        }
+
+        if (port[1] == 1) {
+        	radioButtonPortAPin1.setSelected(true);
+        } else {
+        	radioButtonPortAPin1.setSelected(false);
+        }
+
+        if (port[2] == 1) {
+        	radioButtonPortAPin2.setSelected(true);
+        } else {
+        	radioButtonPortAPin2.setSelected(false);
+        }
+
+        if (port[3] == 1) {
+        	radioButtonPortAPin3.setSelected(true);
+        } else {
+        	radioButtonPortAPin3.setSelected(false);
+        }
+
+        if (port[4] == 1) {
+        	radioButtonPortAPin4.setSelected(true);
+        } else {
+        	radioButtonPortAPin4.setSelected(false);
+        }
+	}
+	      
+	public static void setTrisPortA(){
+		int[] trisA = ParDecInt.reg.getTrisA();
+
+        if (trisA[0] == 1) {
+        	radioButtonPortATris0.setSelected(true);
+        } else {
+        	radioButtonPortATris0.setSelected(false);
+        }
+        if (trisA[1] == 1) {
+        	radioButtonPortATris1.setSelected(true);
+        } else {
+        	radioButtonPortATris1.setSelected(false);
+        }
+        if (trisA[2] == 1) {
+        	radioButtonPortATris2.setSelected(true);
+        } else {
+        	radioButtonPortATris2.setSelected(false);
+        }
+        if (trisA[3] == 1) {
+        	radioButtonPortATris3.setSelected(true);
+        } else {
+        	radioButtonPortATris3.setSelected(false);
+        }
+        if (trisA[4] == 1) {
+        	radioButtonPortATris4.setSelected(true);
+        } else {
+        	radioButtonPortATris4.setSelected(false);
+        }
+	}
+	
+	public static int getPinsPortB(){
+		int buf[] = new int[8];
+		int buffer=0;
+		if(radioButtonPortBPin0.isSelected()==true){
 			buf[0]=1;
 		}else{
 			buf[0]=0;
 		}
-		if(radioButtonPortATris1.isSelected()==true){
+		if(radioButtonPortBPin1.isSelected()==true){
 			buf[1]=1;
 		}else{
 			buf[1]=0;
 		}
-		if(radioButtonPortATris2.isSelected()==true){
+		if(radioButtonPortBPin2.isSelected()==true){
 			buf[2]=1;
 		}else{
 			buf[2]=0;
 		}
-		if(radioButtonPortATris3.isSelected()==true){
+		if(radioButtonPortBPin3.isSelected()==true){
 			buf[3]=1;
 		}else{
 			buf[3]=0;
 		}
-		if(radioButtonPortATris4.isSelected()==true){
+		if(radioButtonPortBPin4.isSelected()==true){
 			buf[4]=1;
 		}else{
 			buf[4]=0;
 		}
-		if(radioButtonPortATris5.isSelected()==true){
+		if(radioButtonPortBPin5.isSelected()==true){
 			buf[5]=1;
 		}else{
 			buf[5]=0;
 		}
-		if(radioButtonPortATris6.isSelected()==true){
+		if(radioButtonPortBPin6.isSelected()==true){
 			buf[6]=1;
 		}else{
 			buf[6]=0;
 		}
-		if(radioButtonPortATris7.isSelected()==true){
+		if(radioButtonPortBPin7.isSelected()==true){
 			buf[7]=1;
 		}else{
 			buf[7]=0;
 		}
-		return buf;
+		for(int i =0; i<= 7; i++){
+			if(buf[i]==1)
+				buffer=(int) (buffer+Math.pow(2,i));
+		}
+		return buffer;
 	}
 	
+	public static void setPinsPortB() {
+        int[] port = ParDecInt.reg.getPortB();
+
+        if (port[0] == 1) {
+            radioButtonPortBPin0.setSelected(true);
+        } else {
+        	radioButtonPortBPin0.setSelected(false);
+        }
+
+        if (port[1] == 1) {
+        	radioButtonPortBPin1.setSelected(true);
+        } else {
+        	radioButtonPortBPin1.setSelected(false);
+        }
+
+        if (port[2] == 1) {
+        	radioButtonPortBPin2.setSelected(true);
+        } else {
+        	radioButtonPortBPin2.setSelected(false);
+        }
+
+        if (port[3] == 1) {
+        	radioButtonPortBPin3.setSelected(true);
+        } else {
+        	radioButtonPortBPin3.setSelected(false);
+        }
+
+        if (port[4] == 1) {
+        	radioButtonPortBPin4.setSelected(true);
+        } else {
+        	radioButtonPortBPin4.setSelected(false);
+        }
+        
+        if (port[5] == 1) {
+        	radioButtonPortBPin5.setSelected(true);
+        } else {
+        	radioButtonPortBPin5.setSelected(false);
+        }
+        
+        if (port[6] == 1) {
+        	radioButtonPortBPin6.setSelected(true);
+        } else {
+        	radioButtonPortBPin6.setSelected(false);
+        }
+        
+        if (port[7] == 1) {
+        	radioButtonPortBPin7.setSelected(true);
+        } else {
+        	radioButtonPortBPin7.setSelected(false);
+        }
+	}
+	
+	public static void setTrisPortB(){
+		int[] trisB = ParDecInt.reg.getTrisB();
+
+		 if (trisB[0] == 1) {
+			 radioButtonPortBTris0.setSelected(true);
+        } else {
+        	radioButtonPortBTris0.setSelected(false);
+        }
+        if (trisB[1] == 1) {
+        	radioButtonPortBTris1.setSelected(true);
+        } else {
+        	radioButtonPortBTris1.setSelected(false);
+        }
+        if (trisB[2] == 1) {
+        	radioButtonPortBTris2.setSelected(true);
+        } else {
+        	radioButtonPortBTris2.setSelected(false);
+        }
+        if (trisB[3] == 1) {
+        	radioButtonPortBTris3.setSelected(true);
+        } else {
+        	radioButtonPortBTris3.setSelected(false);
+        }
+        if (trisB[4] == 1) {
+        	radioButtonPortBTris4.setSelected(true);
+        } else {
+        	radioButtonPortBTris4.setSelected(false);
+        }
+        if (trisB[5] == 1) {
+        	radioButtonPortBTris5.setSelected(true);
+        } else {
+        	radioButtonPortBTris5.setSelected(false);
+        }
+        if (trisB[6] == 1) {
+        	radioButtonPortBTris6.setSelected(true);
+        } else {
+        	radioButtonPortBTris6.setSelected(false);
+        }
+        if (trisB[7] == 1) {
+        	radioButtonPortBTris7.setSelected(true);
+        } else {
+        	radioButtonPortBTris7.setSelected(false);
+        }
+	}
 	private static void addPopup(Component component, final JPopupMenu popup) {
 		component.addMouseListener(new MouseAdapter() {
 			public void mousePressed(MouseEvent e) {

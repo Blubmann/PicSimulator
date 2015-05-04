@@ -14,6 +14,9 @@ public class RegTable extends JTable {
     private int[] register1 = ParDecInt.reg.bank1;
     private JTable table = new JTable();
     
+    /**Initialisiert die Tabelle auf der Gui mit Namen der wichtigsten Registerstellen und lädt Inhalte 
+     *von vorinitialisierten Registerinhalten rein
+     */
     public RegTable(JScrollPane scrollPane){
     	int count=0;
     	for(int k=0;k<128;k++){
@@ -56,6 +59,7 @@ public class RegTable extends JTable {
 		table.getColumnModel().getColumn(1).setPreferredWidth(100);	
     }
     
+    /**Updated die Tabelle auf der Gui, wenn die Methode refreshGui() aufgerufen wird oder der Button für Bank0 gedrückt wird**/
     public void updateTable0(JScrollPane scrollPane){
     	int count=0;
     	for(int k=0;k<128;k++){
