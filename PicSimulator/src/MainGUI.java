@@ -64,6 +64,7 @@ public class MainGUI extends JFrame{
 	public static JTextField textField_Laufzeit = new JTextField();
 	public static JTextField textField_Watchdog = new JTextField();
 	public static JTextField textField_Frequenz = new JTextField();
+	public static JTextField textField_Prescaler = new JTextField();
 	static JRadioButton radioButtonPortAPin0 = new JRadioButton("");
 	static JRadioButton radioButtonPortAPin1 = new JRadioButton("");
 	static JRadioButton radioButtonPortAPin2 = new JRadioButton("");
@@ -127,7 +128,7 @@ public class MainGUI extends JFrame{
 		textField_Frequenz.setBounds(296, 12, 46, 20);
 		textField_Frequenz.setColumns(10);
 		textField_Watchdog.setEditable(false);
-		textField_Watchdog.setBounds(592, 727, 86, 20);
+		textField_Watchdog.setBounds(797, 727, 86, 20);
 		textField_Watchdog.setColumns(10);
 		textField_Laufzeit.setEditable(false);
 		textField_Laufzeit.setBounds(392, 503, 86, 20);
@@ -438,7 +439,7 @@ public class MainGUI extends JFrame{
 		contentPane.add(radioButtonPortBPin7);
 		
 		
-		scrollPane_2.setBounds(499, 530, 130, 171);
+		scrollPane_2.setBounds(704, 530, 130, 171);
 		contentPane.add(scrollPane_2);
 		scrollPane_2.setViewportView(stackList);
 		
@@ -466,17 +467,27 @@ public class MainGUI extends JFrame{
 		
 		contentPane.add(lblLaufzeit);
 		contentPane.add(textField_Laufzeit);
-		lblStack.setBounds(499, 506, 46, 14);
+		lblStack.setBounds(704, 506, 46, 14);
 		
 		contentPane.add(lblStack);
-		lblWatchdog.setBounds(499, 730, 62, 14);
+		lblWatchdog.setBounds(704, 730, 62, 14);
 		
 		contentPane.add(lblWatchdog);
 		contentPane.add(textField_Watchdog);
-		radioButton_Watchdog.setBounds(565, 725, 21, 23);
+		radioButton_Watchdog.setBounds(770, 725, 21, 23);
 		contentPane.add(radioButton_Watchdog);
 		
 		contentPane.add(textField_Frequenz);
+		
+		JLabel lblPrescaler = new JLabel("Prescaler");
+		lblPrescaler.setBounds(520, 506, 46, 14);
+		contentPane.add(lblPrescaler);
+		
+
+		textField_Prescaler.setEditable(false);
+		textField_Prescaler.setBounds(586, 503, 46, 20);
+		contentPane.add(textField_Prescaler);
+		textField_Prescaler.setColumns(10);
 	}	
 	
 	/**Erstellt den "Datei öffnen"-Dialog, prüft ob eine Datei ausgewählt wurde und übergibt diese an die 

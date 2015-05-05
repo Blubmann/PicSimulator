@@ -10,11 +10,11 @@ public class PicCPU {
 		f= getIndirectAdress(f);
 		int w = ParDecInt.reg.getWReg(); 
 		int buf = getValFromBank(f)+w;
-		int dc = (w & 15) + getValFromBank(f) & 15;
-		setDCFlag(dc);
+		int dc = (w & 15) + (getValFromBank(f) & 15);
 		setCFlag(buf);
+		setDCFlag(dc);
+		buf = buf&255;
 		setZFlag(buf);
-		buf = buf&0b11111111;
 		checkDandInsert(buf,f,d);
 		ParDecInt.reg.increasePC();
 		ParDecInt.reg.addCycle();
@@ -57,7 +57,9 @@ public class PicCPU {
 	public void decF(int f, int d){
 		f = getIndirectAdress(f);
 		int fBuf = getValFromBank(f);
-		fBuf=valsmaller0(fBuf);
+		if(fBuf==0){
+			fBuf=256;
+		}
 		int buf = fBuf-1;
 		setZFlag(buf);
 		checkDandInsert(buf,f,d);
@@ -84,8 +86,10 @@ public class PicCPU {
 	public void incF(int f, int d){
     	f = getIndirectAdress(f);
     	int buf = getValFromBank(f)+1;
+    	if(buf>255){
+    		buf=0;
+    	}
     	setZFlag(buf);
-    	buf = valbigger255(buf);
     	checkDandInsert(buf,f,d);
 		ParDecInt.reg.increasePC();
 		ParDecInt.reg.addCycle();
@@ -138,7 +142,7 @@ public class PicCPU {
     public void rlf(int f, int d) {
     	f = getIndirectAdress(f);
     	int msb = getValFromBank(f)&128;
-    	int buf = getValFromBank(f)<<1;
+    	int buf = (getValFromBank(f)<<1)&255;
     	if(msb==128){
     		msb=1;
     	}
@@ -146,6 +150,7 @@ public class PicCPU {
     		buf = buf +1;
     	}
     	ParDecInt.reg.setStatusReg(ParDecInt.reg.CFLAG, msb);
+    	checkDandInsert(buf, f, d);
     	ParDecInt.reg.increasePC();
     	ParDecInt.reg.addCycle();
     }
@@ -153,24 +158,26 @@ public class PicCPU {
     public void rrf(int f, int d) {
     	f = getIndirectAdress(f);
     	int lsb = getValFromBank(f)&1;
-    	int buf = getValFromBank(f)>>1;
+    	int buf = (getValFromBank(f)>>1)&255;
     	if(ParDecInt.reg.getStatusReg(ParDecInt.reg.CFLAG)!=0){
     		buf = buf + 128;
     	}
     	ParDecInt.reg.setStatusReg(ParDecInt.reg.CFLAG, lsb);
+    	checkDandInsert(buf, f, d);
     	ParDecInt.reg.increasePC();
     	ParDecInt.reg.addCycle();
     }
     
     public void subWF(int f, int d) {
     	f = getIndirectAdress(f);
-    	int buf = getValFromBank(f)+(-ParDecInt.reg.getWReg());
-    	int dc = getValFromBank(f)& 15+(-ParDecInt.reg.getWReg()&15);
-    	setDCFlag(dc);
-    	setCFlag(buf);
-    	setZFlag(buf);
-    	buf = valsmaller0(buf);
-    	checkDandInsert(buf, f, d);
+    	int buf = (ParDecInt.reg.getWReg()^255)+1;
+    	int buf2 = getValFromBank(f) + buf;
+    	int dc = (getValFromBank(f)&15)+(buf&15);
+    	setCFlag(buf2);
+    	setDCFlag(dc);	
+    	buf2=buf2&255;
+    	setZFlag(buf2);
+    	checkDandInsert(buf2, f, d);
     	ParDecInt.reg.increasePC();
     	ParDecInt.reg.addCycle();
     }
@@ -316,10 +323,10 @@ public class PicCPU {
 		int w = ParDecInt.reg.getWReg(); 
 		int buf= w + k;
 		int dc = (w&15)+(k&15);
-		setDCFlag(dc);
 		setCFlag(buf);
+		setDCFlag(dc);
+		buf =buf&255;
 		setZFlag(buf);
-		buf = valbigger255(buf);
 		checkDandInsert(buf,0,0);
 		ParDecInt.reg.increasePC();
 		ParDecInt.reg.addCycle();
@@ -328,8 +335,7 @@ public class PicCPU {
 	
 	public void andLW (int k){
 		int w = ParDecInt.reg.getWReg();
-		int buf = k & w;
-		buf = valbigger255(buf);
+		int buf = w & k;
 		setZFlag(buf);
 		checkDandInsert(buf,0,0);
 		ParDecInt.reg.increasePC();
@@ -360,7 +366,7 @@ public class PicCPU {
 	
 	public void iorLW(int k){
 		int w = ParDecInt.reg.getWReg();
-		int buf = k|w;
+		int buf = w|k;
 		setZFlag(buf);
 		checkDandInsert(buf,0,0);
 		ParDecInt.reg.increasePC();
@@ -405,13 +411,13 @@ public class PicCPU {
 	}
 	
 	public void subLW(int k){
-		int w = ParDecInt.reg.getWReg();
-		int buf = k+(-w);
-		int dc = (k & 15)+((-w) & 15);
-		setDCFlag(dc);
+		int w = (ParDecInt.reg.getWReg()^255)+1;
+		int buf = k+w;
+		int dc = (k & 15)+(w & 15);
 		setCFlag(buf);
+		setDCFlag(dc);
+		buf=buf&255;
 		setZFlag(buf);
-		buf = valsmaller0(buf);
 		checkDandInsert(buf,0,0);
 		ParDecInt.reg.increasePC();
 		ParDecInt.reg.addCycle();
@@ -419,7 +425,7 @@ public class PicCPU {
 	
 	public void xorLW(int k){
 		int w = ParDecInt.reg.getWReg();
-		int buf = k ^ w;
+		int buf = w ^ k;
 		setZFlag(buf);
         checkDandInsert(buf,0,0);
     	ParDecInt.reg.increasePC();
@@ -456,7 +462,7 @@ public class PicCPU {
 	 * das C-Flag gesetzt werden
 	 */
 	private void setCFlag(int val){
-		if(val<255){
+		if((val&256)==0){
 			ParDecInt.reg.setStatusReg(ParDecInt.reg.CFLAG, 0);
 		}else {
 			ParDecInt.reg.setStatusReg(ParDecInt.reg.CFLAG, 1);
@@ -467,7 +473,7 @@ public class PicCPU {
 	 * Operation 0 ist, wird das Z-Flag gesetzt
 	 */
 	private void setZFlag(int val){
-		if ((val&0xFF)==0){
+		if (val==0){
 			ParDecInt.reg.setStatusReg(ParDecInt.reg.ZFLAG, 1);
 		}else{
 			ParDecInt.reg.setStatusReg(ParDecInt.reg.ZFLAG, 0);
@@ -475,23 +481,17 @@ public class PicCPU {
 	}
 	
 	private void setDCFlag(int val){
-		if(val<15){
+		if((val&16)==0){
 			ParDecInt.reg.setStatusReg(ParDecInt.reg.DCFLAG, 0);
 		}else{
 			ParDecInt.reg.setStatusReg(ParDecInt.reg.DCFLAG, 1);
 		}
 	}
 	
-	private int valbigger255(int val){
+	private int valCheck(int val){
 		if(val>255){
-			return (val-255);
-		}else{
-			return val;
-		}
-	}
-	
-	private int valsmaller0(int val){
-		if(val<=0){
+			return (val-256);
+		}else if(val<0){
 			return(256-val);
 		}else{
 			return val;
@@ -507,13 +507,15 @@ public class PicCPU {
 			}else{
 				if(ParDecInt.reg.getBank()==0){
 					ParDecInt.reg.setRegister0(f, buf);
-					//System.out.println("Im Register0 steht an Stelle "+f+" die Zahl"+buf);
+					System.out.println("Im Register0 steht an Stelle "+f+" die Zahl"+buf);
 					ParDecInt.reg.synchronizeBothBanks(f, buf);
 				}else{
 					ParDecInt.reg.setRegister1(f, buf);
+					System.out.println("Im Register1 steht an Stelle "+f+" die Zahl"+buf);
 					ParDecInt.reg.synchronizeBothBanks(f, buf);
 				}
 				ParDecInt.reg.checkPCL(f);
+				ParDecInt.reg.checkTimer0Manipulation(f, buf);
 			}
 	}
 }

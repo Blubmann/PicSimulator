@@ -16,6 +16,7 @@ public class ParDecInt extends Thread{
 					break;
 				}
 				try {
+					reg.setBank();
 					i=reg.getPC();
 					decode(i);
 					reg.statusToMemory();
@@ -48,6 +49,7 @@ public class ParDecInt extends Thread{
 		}
 		i=reg.getPC();
 		if(MainGUI.step=true && i<=(instructions.length-1)){
+				reg.setBank();
 				decode(i);
 				reg.setBank();
 				reg.statusToMemory();
@@ -223,8 +225,8 @@ public class ParDecInt extends Thread{
             System.out.println("BTFSC, f ist " + f +" b ist " + b);
 		}
 		else if(instructions[line] >= 7168 && instructions[line] <= 8191){
-			int f = instructions[line] & 127;
             int b = getBits(instructions[line] & 896);
+			int f = instructions[line] & 127;
             cpu.btfss(f, b);
             System.out.println("BTFSS, f ist " + f +" b ist " + b);
 		}
@@ -302,6 +304,8 @@ public class ParDecInt extends Thread{
 			return 0;
 		case 128:
 			return 1;
+		case 256:
+            return 2;
 		case 384:
             return 3;
         case 512:

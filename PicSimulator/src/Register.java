@@ -39,7 +39,7 @@ public class Register {
 	
 	/**Variable zum Zählen der Cycles, um die Laufzeit zu berechnen**/
 	public static int cycleCounter;
-	public double runtime;
+	public static double runtime;
 	
 	private Stack<Integer> stack = new Stack<Integer>();
 	
@@ -85,6 +85,8 @@ public class Register {
 		this.cycleCounter=0;
 		this.bank0[STATUS] = 24;
 		this.bank1[STATUS] = 24;
+		this.statusReg[NOTPD] =1;
+		this.statusReg[NOTTO] =1;
 		this.bank1[OPTION] = 255;
 		this.bank1[TRISA] = 31;
 		this.bank1[TRISB] = 255;
@@ -180,6 +182,7 @@ public class Register {
 		MainGUI.textField_Watchdog.setText(Integer.toString(watchDog));
 		MainGUI.textField_Frequenz.setText(Integer.toString(MainGUI.slider.getValue()));
 		MainGUI.textField_Laufzeit.setText(Double.toString(getRuntime()));
+		MainGUI.textField_Prescaler.setText(Integer.toString(prescaler));
 		//TODO Bug, da die Laufzeit bei größeren Quarzfrequenzen nicht angezeigt wird
 	}
 	
@@ -260,7 +263,7 @@ public class Register {
         		buf=(int) (buf+Math.pow(2, i));
         	}
         }
-        System.out.println("Es wird "+buf+" in die Register geschrieben");
+        //System.out.println("Es wird "+buf+" in die Register geschrieben");
         bank0[STATUS] = buf;
         bank1[STATUS] = buf;
     }
@@ -337,22 +340,29 @@ public class Register {
 	
 	public void addCycle(){
 		cycleCounter++;
-		this.runtime = runtime + (4000000/MainGUI.slider.getValue());
+		runtime = runtime + (4000000/Double.parseDouble(Integer.toString(MainGUI.slider.getValue())));
 		checkRA4Int();
 		increaseTimer0();
 		decreaseWDT();
 	}
 	
 	public double getRuntime(){
-		return this.runtime;
+		return runtime;
 	}
 	/**Hält die Registerzellen fsr, status, pclath und intcon synchron**/
 	public void synchronizeBothBanks(int f, int val) {
-        if (f == FSR || f == STATUS || f == PCLATH || f == INTCON) {
+        if (f==0 || f==PCL || f == FSR || f == STATUS || f == PCLATH || f == INTCON) {
+        	System.out.println("F ist "+f+" die Varibale ist "+val);
             bank0[f] = val;
             bank1[f] = val;
         }
     }
+	
+	public void checkTimer0Manipulation(int f, int val){
+		if(f==TMR0){
+			setPrescaler();
+		}
+	}
 	
 	public Object[] getStack(){
 		
