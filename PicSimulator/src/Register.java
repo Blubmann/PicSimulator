@@ -1,3 +1,4 @@
+import java.util.ArrayList;
 import java.util.EmptyStackException;
 import java.util.Stack;
 
@@ -80,29 +81,36 @@ public class Register {
 	
 	/**Belegung mit Initwerten**/
 	public Register(){
-		this.wReg=0;
-		this.pc=0;
-		this.cycleCounter=0;
+		this.wReg = 0;
+		this.pc = 0;
+		this.cycleCounter = 0;
+		this.bank0[TMR0] = 0;
 		this.bank0[STATUS] = 24;
 		this.bank1[STATUS] = 24;
-		this.statusReg[NOTPD] =1;
-		this.statusReg[NOTTO] =1;
+		this.statusReg[NOTPD] = 1;
+		this.statusReg[NOTTO] = 1;
 		this.bank1[OPTION] = 255;
 		this.bank1[TRISA] = 31;
 		this.bank1[TRISB] = 255;
 	}
 	
 	public void reset(){
-		this.pc=0;
-		this.bank0[PCL]=pc;
-		this.bank1[PCL]=pc;
-		this.bank0[STATUS]=bank0[STATUS]&7;
-		this.bank1[STATUS]=bank1[STATUS]&7;
+		this.wReg = 0;
+		this.pc = 0;
+		this.bank0[PCL] = 0;
+		this.bank1[PCL] = 0;
+		this.cycleCounter = 0;
+		this.runtime = 0;
+		this.bank0[STATUS] = 24;
+		this.bank1[STATUS] = 24;
 		this.bank1[OPTION] = 255;
 		this.bank0[PCLATH] = 0;
 		this.bank1[PCLATH] = 0;
-		this.bank0[INTCON] = bank0[INTCON]&1;
-		this.bank1[INTCON] = bank1[INTCON]&1;
+		this.bank1[TRISA] = 31;
+		this.bank1[TRISB] = 255;
+		this.bank0[INTCON] = 0;
+		this.bank1[INTCON] = 0;
+		stack.clear();
 	}
 	
 	/**Speichert den PC für den Folgebefehl nach z.B. einem Call**/
@@ -143,8 +151,27 @@ public class Register {
 	 */
 	public void refreshGUI(){
 		setGuiFlags();
-		MainGUI.setPinsPortA();
-		MainGUI.setPinsPortB();
+		if(MainGUI.comPortEnable){
+		 	//updateCom();
+			//updatePortAComPort();
+			//updatePortBComPort();
+			try {
+				Hardwareansteuerung.sendRS232();
+				ArrayList<Integer> answer = Hardwareansteuerung.read();
+				ParDecInt.reg.bank0[ParDecInt.reg.PORTA]= answer.get(0);
+				System.out.println("Das steht in anser0 "+answer.get(0));
+				System.out.println("Das steht in Bank0A "+bank0[PORTA]);
+				ParDecInt.reg.bank0[ParDecInt.reg.PORTB]= answer.get(1);
+				MainGUI.setPinsPortA();
+				MainGUI.setPinsPortB();
+			}catch (Exception e1) {
+			    System.out.println("Ich bin doof");
+			}
+		}else{
+			MainGUI.setPinsPortA();
+			MainGUI.setPinsPortB();
+		}
+		
 		MainGUI.setTrisPortA();
 		MainGUI.setTrisPortB();
 		updateStack();
@@ -153,6 +180,30 @@ public class Register {
 		}else{
 			MainGUI.regtab.updateTable1(MainGUI.scrollPane_1);
 		}
+	}
+	
+	public void updateCom(){
+		System.out.println("Ich bin ein Test");
+		MainGUI.comPort.writeOut();
+		MainGUI.comPort.readIn();
+	}
+	
+	public void updatePortAComPort(){
+		MainGUI.comPort.updatePortA(MainGUI.getPinsPortA());
+		int portA = MainGUI.comPort.getInputPortA();
+		System.out.println("PortA enthält bei der Übergabe "+portA);
+		bank0[PORTA]=portA;
+		System.out.println("Im Register an PortA steht "+portA);
+		MainGUI.comPort.updatePortA(portA);
+		MainGUI.setPinsPortA();
+	}
+	
+	public void updatePortBComPort(){
+		MainGUI.comPort.updatePortB(MainGUI.getPinsPortB());
+		int portB = MainGUI.comPort.getInputPortB();
+		bank0[PORTB]=portB;
+		MainGUI.comPort.updatePortB(portB);
+		MainGUI.setPinsPortB();
 	}
 	
 	/**Holt sich den Stack als Objekt und schreibt ihn dann auf der Gui**/
@@ -197,7 +248,7 @@ public class Register {
 	 * 		a = 2 -> 2%2=0 ->.....
 	 */
 	public int[] getTrisB() {
-        int a = this.bank1[TRISB];
+        int a = bank1[TRISB];
         int[] trisBBits = new int[8];
 
         for (int i = 0; i <8; i++) {
@@ -209,7 +260,7 @@ public class Register {
     }
 	
 	public int[] getTrisA() {
-        int a = this.bank1[TRISA];
+        int a = bank1[TRISA];
         int[] trisABits = new int[5];
 
         for (int i = 0; i <5; i++) {
@@ -221,7 +272,8 @@ public class Register {
     }
 	
 	public int[] getPortA(){
-		int a = this.bank0[PORTA];
+		int a = bank0[PORTA];
+		System.out.println("Das steht in PortA "+bank0[PORTA]);
         int[] portABits = new int[5];
 
         for (int i = 0; i <=4; i++) {
@@ -233,7 +285,7 @@ public class Register {
 	}
 	
 	public int[] getPortB(){
-		int a = this.bank0[PORTB];
+		int a = bank0[PORTB];
         int[] portBBits = new int[8];
 
         for (int i = 0; i <=7; i++) {
@@ -598,8 +650,10 @@ public class Register {
 	public void checkWDTReset(){
 		if(watchDog==0){
 			watchDog=18000;
+			MainGUI.run=false;
 			setPrescaler();
 			refreshGUI();
+			reset();
 		}
 	}
 	public void checkRB0Int(){

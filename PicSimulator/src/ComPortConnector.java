@@ -69,8 +69,6 @@ public class ComPortConnector extends JFrame {
         btnCancel.setBounds(255, 42, 89, 23);
         getContentPane().add(btnCancel);
 
-        jLabel1.setText("Please choose the COM-Port you want to connect to.");
-
         btnConnect.setText("Connect");
         btnConnect.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {

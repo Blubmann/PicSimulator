@@ -1,4 +1,5 @@
 import java.awt.BorderLayout;
+import java.awt.Desktop;
 import java.awt.EventQueue;
 
 import javax.swing.JFrame;
@@ -31,6 +32,7 @@ import java.io.BufferedReader;
 import java.io.File;
 import java.io.FileReader;
 import java.io.IOException;
+import java.util.ArrayList;
 import java.util.Vector;
 
 import javax.swing.JList;
@@ -47,7 +49,8 @@ public class MainGUI extends JFrame{
 	public ParDecInt pardecint;
 	private CodeTable codetab;
 	public static RegTable regtab;
-    private static ComPort comPort;
+    public static ComPort comPort;
+    public static Hardwareansteuerung penis;
 	public static JScrollPane scrollPane = new JScrollPane();
 	public static JScrollPane scrollPane_1 = new JScrollPane();
 	public static JScrollPane scrollPane_2 = new JScrollPane();
@@ -99,6 +102,7 @@ public class MainGUI extends JFrame{
 	public static boolean comPortEnable=false;
 	private JButton btnStart = new JButton("Start");
 	private JButton btnStepbystep = new JButton("Step-by-Step");
+	private JButton btnReset = new JButton("Reset");
 	private static JButton btnConnect = new JButton("Connect");
 	private final JLabel lblFrequenz = new JLabel("Frequenz");
 	private final JLabel lblLaufzeit = new JLabel("Laufzeit");
@@ -154,6 +158,19 @@ public class MainGUI extends JFrame{
 		});
 		mnMen.add(mntmOpen);
 		
+		JMenuItem mntmHelp = new JMenuItem("Help");
+		mntmHelp.addActionListener(new ActionListener() {
+			public void actionPerformed(ActionEvent arg0) {
+				try {
+					Desktop.getDesktop().open(new File("PIC_VIEW.pdf"));
+				} catch (IOException e1) {
+	
+					e1.printStackTrace();
+				}
+			}
+		});
+		mnMen.add(mntmHelp);
+		
 		JMenuItem mntmExit = new JMenuItem("Exit");
 		mnMen.add(mntmExit);
 		contentPane = new JPanel();
@@ -183,7 +200,8 @@ public class MainGUI extends JFrame{
 			}
 		});
 		btnStart.setBounds(10, 11, 89, 23);
-		contentPane.add(btnStart);		
+		contentPane.add(btnStart);	
+		btnStart.setEnabled(false);
 		
 		
 		scrollPane.setBounds(358, 15, 698, 465);
@@ -224,6 +242,7 @@ public class MainGUI extends JFrame{
 		});
 		btnStepbystep.setBounds(98, 11, 101, 23);
 		contentPane.add(btnStepbystep);
+		btnStepbystep.setEnabled(false);
 		
 		slider.setBounds(237, 37, 95, 23);
 		contentPane.add(slider);
@@ -488,13 +507,32 @@ public class MainGUI extends JFrame{
 		textField_Prescaler.setBounds(586, 503, 46, 20);
 		contentPane.add(textField_Prescaler);
 		textField_Prescaler.setColumns(10);
+		
+		btnReset.addActionListener(new ActionListener() {
+			public void actionPerformed(ActionEvent arg0) {
+				run = false;
+				try {
+					Thread.sleep(100);
+				} catch (InterruptedException e) {
+					// TODO Auto-generated catch block
+					e.printStackTrace();
+				}
+				ParDecInt.reg.reset();
+				ParDecInt.reg.refreshGUI();
+				btnStart.setText("Start");
+				btnStepbystep.setEnabled(true);
+			}
+		});
+		btnReset.setEnabled(false);
+		btnReset.setBounds(10, 37, 89, 23);
+		contentPane.add(btnReset);
 	}	
 	
 	/**Erstellt den "Datei öffnen"-Dialog, prüft ob eine Datei ausgewählt wurde und übergibt diese an die 
 	 * Methode readandwrite()
 	 */
 	public void openclicked() {
-		File file =null;
+		File file = null;
 		/** Öffnen des Dialogs für die Auswahl der Datei**/
 		JFileChooser open = new JFileChooser();
 		open.setDialogTitle("Datei öffnen");
@@ -509,6 +547,9 @@ public class MainGUI extends JFrame{
             file = open.getSelectedFile();
             codetab.removeAll();
             readandwrite(file);
+            btnStart.setEnabled(true);
+            btnStepbystep.setEnabled(true);
+            btnReset.setEnabled(true);
         }else if(rVal==JFileChooser.CANCEL_OPTION){
         	System.out.println("JFileChooser canceled");
         }
@@ -519,7 +560,7 @@ public class MainGUI extends JFrame{
 	 */
 	private void readandwrite(File file){
 		String[] Buffer; //Buffer für Programmcode
-		int j= 0;
+		int j = 0;
 		int lineCount = 0;
 		String record = null;
 		try{
@@ -576,7 +617,7 @@ public class MainGUI extends JFrame{
 	}
 	
 	public static boolean getWatchdogEnable(){
-		if(radioButton_Watchdog.isSelected()==true){
+		if(radioButton_Watchdog.isSelected() == true){
 			return true;
 		}else{
 			return false;
@@ -588,21 +629,21 @@ public class MainGUI extends JFrame{
 	 */
 	public static int getPinsPortA(){
 		int buf[] = new int[5];
-		int buffer=0;
+		int buffer = 0;
 		if(radioButtonPortAPin0.isSelected()==true){
-			buf[0]=1;
+			buf[0] = 1;
 		}else{
-			buf[0]=0;
+			buf[0] = 0;
 		}
 		if(radioButtonPortAPin1.isSelected()==true){
-			buf[1]=1;
+			buf[1] = 1;
 		}else{
-			buf[1]=0;
+			buf[1] = 0;
 		}
 		if(radioButtonPortAPin2.isSelected()==true){
-			buf[2]=1;
+			buf[2] = 1;
 		}else{
-			buf[2]=0;
+			buf[2] = 0;
 		}
 		if(radioButtonPortAPin3.isSelected()==true){
 			buf[3]=1;
@@ -682,9 +723,6 @@ public class MainGUI extends JFrame{
         	radioButtonPortATris4.setSelected(true);
         } else {
         	radioButtonPortATris4.setSelected(false);
-        }
-        if(comPortEnable){
-        	comPort.updatePortA(ParDecInt.reg.bank1[ParDecInt.reg.TRISA]);
         }
 	}
 	
@@ -833,15 +871,12 @@ public class MainGUI extends JFrame{
         } else {
         	radioButtonPortBTris7.setSelected(false);
         }
-        if(comPortEnable){
-        	comPort.updatePortB(ParDecInt.reg.bank1[ParDecInt.reg.TRISB]);
-        }
 	}
 	
 	public static void connectComPort(String comPortName){
-		comPort = new ComPort(ParDecInt.reg.bank0[ParDecInt.reg.TRISA], ParDecInt.reg.bank0[ParDecInt.reg.PORTA],ParDecInt.reg.bank0[ParDecInt.reg.TRISB],ParDecInt.reg.bank0[ParDecInt.reg.PORTB]);
+		penis = new Hardwareansteuerung(ParDecInt.reg.bank0[ParDecInt.reg.TRISA], ParDecInt.reg.bank0[ParDecInt.reg.PORTA],ParDecInt.reg.bank0[ParDecInt.reg.TRISB],ParDecInt.reg.bank0[ParDecInt.reg.PORTB]);
 		try{
-			comPort.connect(comPortName);
+			penis.connect(comPortName);
 			comPortEnable= true;
 			btnConnect.setText("Disconnect");
 			btnConnect.setEnabled(true);
@@ -851,7 +886,7 @@ public class MainGUI extends JFrame{
 	}
 	
 	public static void disconnectComPort(){
-        comPort.close();
+		penis.close();
         btnConnect.setText("Connect");
 		btnConnect.setEnabled(true);
         comPortEnable = false;

@@ -107,6 +107,7 @@ public class ComPort {
     /** Methode um den im Zwischenspeicher liegenden PortA-Wert auszugeben.
      */
     public int getInputPortA(){
+    	System.out.println("PortA enthält vor der Übergabe "+portA);
         return portA;
     }
     
@@ -202,8 +203,10 @@ public class ComPort {
             int counter = 0;
             while ( c > -1 ) {
                 c = (byte)in.read();
+                //System.out.print("C ist " +in.read()+"\n");
                 if(c < 0){break;}
                 portAB[counter] = (int) c;
+                //System.out.print("PortAB " +counter+ " mit dem Wert "+portAB[counter]+"\n");
                 counter++;
             }
             if(portAB[0] > 48){
@@ -220,8 +223,10 @@ public class ComPort {
      * den Variablen zuzuweisen.
      */
     private void updatePortsFromReadIn(int portAB[]){
-        portA = ((portAB[0]-0x32) << 4) + portAB[1]-0x30;
-        portB = ((portAB[2]-0x30) << 4) + portAB[3]-0x30;
+        portA = ((portAB[0]-0x32) << 4) + (portAB[1]-0x30);
+        System.out.println("Ich schreibe " + portA+ " in PortA");
+        portB = ((portAB[2]-0x30) << 4) + (portAB[3]-0x30);
+        System.out.println("Ich schreibe " +portB+ " an PortB");
     }
 }
 

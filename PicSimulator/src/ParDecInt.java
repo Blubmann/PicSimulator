@@ -39,7 +39,6 @@ public class ParDecInt extends Thread{
 					System.out.println("PortA: "+reg.getRegister0(5));
 					System.out.println("PortB: "+reg.getRegister0(6));
 					**/
-
 				} catch (InterruptedException e) {
 					// TODO Auto-generated catch block
 					e.printStackTrace();
