@@ -1,6 +1,7 @@
 public class ParDecInt extends Thread{
 	public String[] code;
 	public static int[] instructions;
+	public static int[] lineMarker;
 	private Thread t;
 	private int i=0;
 	public static PicCPU cpu = new PicCPU();
@@ -16,6 +17,7 @@ public class ParDecInt extends Thread{
 					break;
 				}
 				try {
+					MainGUI.codetab.updateHighliner();
 					reg.setBank();
 					i=reg.getPC();
 					decode(i);
@@ -25,6 +27,7 @@ public class ParDecInt extends Thread{
 					reg.checkInterrupt();
 					sleep(1000000000/MainGUI.slider.getValue());
 					reg.readGui();
+					MainGUI.codetab.getBreakpointandStop();
 					/**
 					System.out.println("Status 0: "+reg.getStatusReg(0));
 					System.out.println("Status 1: "+reg.getStatusReg(1));
@@ -47,7 +50,8 @@ public class ParDecInt extends Thread{
 			MainGUI.run=false;
 		}
 		i=reg.getPC();
-		if(MainGUI.step=true && i<=(instructions.length-1)){
+		if(MainGUI.step=true && i<=(instructions.length)){
+				MainGUI.codetab.updateHighliner();
 				reg.setBank();
 				decode(i);
 				reg.setBank();
@@ -89,13 +93,14 @@ public class ParDecInt extends Thread{
 			String opcode = singleLines.substring(5, 9);
 			String LineNumber = singleLines.substring(20, 25);
 			opcodeInt = Integer.parseInt(opcode, 16);
-			lineInt = Integer.parseInt(LineNumber, 16);
-			System.out.println("Dezimaler Befehlscode "+opcodeInt);
+			lineInt = Integer.parseInt(LineNumber, 10);
+			System.out.println("Dezimaler Befehlscode "+opcodeInt +" in Zeile "+lineInt);
 			newInst[CodeCount] = opcodeInt;
 			newLineNumber[CodeCount] = lineInt;
 			CodeCount++;
 		}
 		instructions=newInst;
+		lineMarker=newLineNumber;
 	}
 	
 	/**Die Methode bekommt beim Drücken der Starttaste den extrahierten Opcode übergeben und 

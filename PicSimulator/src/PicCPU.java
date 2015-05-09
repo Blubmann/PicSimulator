@@ -352,8 +352,8 @@ public class PicCPU {
 	
 	public void clrwdt(){
 		ParDecInt.reg.watchDog=18000;
-		ParDecInt.reg.setStatusReg(3, 1);
-		ParDecInt.reg.setStatusReg(4, 1);
+		ParDecInt.reg.setStatusReg(3, 0);
+		ParDecInt.reg.setStatusReg(4, 0);
 		ParDecInt.reg.addCycle();
 		ParDecInt.reg.increasePC();
 	}

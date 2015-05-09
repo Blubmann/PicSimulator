@@ -47,7 +47,7 @@ public class MainGUI extends JFrame{
 
 	private JPanel contentPane;
 	public ParDecInt pardecint;
-	private CodeTable codetab;
+	public static CodeTable codetab;
 	public static RegTable regtab;
     public static ComPort comPort;
     public static Hardwareansteuerung penis;
@@ -100,8 +100,8 @@ public class MainGUI extends JFrame{
 	public static boolean run;
 	public static boolean step;
 	public static boolean comPortEnable=false;
-	private JButton btnStart = new JButton("Start");
-	private JButton btnStepbystep = new JButton("Step-by-Step");
+	public static JButton btnStart = new JButton("Start");
+	public static JButton btnStepbystep = new JButton("Step-by-Step");
 	private JButton btnReset = new JButton("Reset");
 	private static JButton btnConnect = new JButton("Connect");
 	private final JLabel lblFrequenz = new JLabel("Frequenz");
@@ -573,7 +573,7 @@ public class MainGUI extends JFrame{
 	                lineCount++;
 	            }
 	        }
-			Buffer = new String[lineCount];
+			Buffer = new String[lineCount];	
 			Vector tableData = new Vector(); //Vector für Tabellen Daten
 			/**File wird Zeile für Zeile ausgelesen und die relevanten Codezeilen in das Array Buffer geschrieben,
 			 * Der komplette Quellcode wird in ein Vektor geschrieben und über setTable auf der GUI angezeigt
@@ -593,7 +593,6 @@ public class MainGUI extends JFrame{
 	        	vec.add(record + "\n");
 	        	tableData.addElement(vec);
 	        	
-	        	
 	           /**Vector<Object> vector = new Vector<Object>();
 	           for (int i = 0; i < list.getModel().getSize(); i++) {
 	                vector.add(list.getModel().getElementAt(i));
@@ -605,8 +604,10 @@ public class MainGUI extends JFrame{
 				list.setListData(vector);**/
 	        	//System.out.println(tableData);
 	        }
+	       
 	        codetab.setTable(scrollPane, tableData);
 	        pardecint = new ParDecInt(Buffer);
+	        codetab.updateHighliner();
 	        br.close();
 			countbr.close();
 			//System.out.println(Buffer[1]);
