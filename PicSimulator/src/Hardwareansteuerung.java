@@ -8,12 +8,16 @@ import java.io.UnsupportedEncodingException;
 import java.util.ArrayList;
 import java.util.Enumeration;
 
+/**
+ * TODO
+ */
 public class Hardwareansteuerung {
   private static OutputStreamWriter out;
   private static InputStreamReader in;
   private static char CR = '\r';
   
-  /** Variable zum zwischenspeichern des TRIS-A Wertes.
+  /** 
+   * Variable zum zwischenspeichern des TRIS-A Wertes.
    * Initialisert mit 31, Wert nach Power-On-Reset
    */
   private int trisA = 31;
@@ -41,7 +45,8 @@ public class Hardwareansteuerung {
    */
   CommPort commPort;
   
-  /** Konstruktor für ComPort.
+  /** 
+   * Konstruktor für ComPort.
    * Initialisiert die Werte von TrisA, TrisB, PortA und PortB, so kann
    * der CommPort auch im laufenden Betrieb zugeschaltet werden.
    */
@@ -52,7 +57,9 @@ public class Hardwareansteuerung {
       portB = aPortB;
   }
   
-  /** Methode um den CommPort zu vebinden.
+  
+  /** 
+   * Methode um den CommPort zu vebinden.
    */
   void connect( String portName ) throws Exception {
       CommPortIdentifier portIdentifier = CommPortIdentifier.getPortIdentifier(portName);
@@ -67,7 +74,9 @@ public class Hardwareansteuerung {
       }
   }
   
-  /** Methode um den aktuell verbundenen CommPort zu trennen und wieder frei zu geben.
+  
+  /** 
+   * Methode um den aktuell verbundenen CommPort zu trennen und wieder frei zu geben.
    */
   public void close(){
       serialPort.close();
@@ -75,10 +84,10 @@ public class Hardwareansteuerung {
   
   public static void sendRS232() throws Exception {
     
-    String p_a = encodeData(ParDecInt.reg.bank0[ParDecInt.reg.PORTA]);
-    String t_a = encodeData(ParDecInt.reg.bank1[ParDecInt.reg.TRISA]);
-    String p_b = encodeData(ParDecInt.reg.bank0[ParDecInt.reg.PORTB]);
-    String t_b = encodeData(ParDecInt.reg.bank1[ParDecInt.reg.TRISB]);
+    String p_a = encodeData(Worker.reg.bank0[Worker.reg.PORTA]);
+    String t_a = encodeData(Worker.reg.bank1[Worker.reg.TRISA]);
+    String p_b = encodeData(Worker.reg.bank0[Worker.reg.PORTB]);
+    String t_b = encodeData(Worker.reg.bank1[Worker.reg.TRISB]);
     String send = t_a + p_a + t_b + p_b;
     write(send + CR);
     
@@ -92,7 +101,7 @@ public class Hardwareansteuerung {
   
   
   public static ArrayList<Integer> read() throws Exception {
-    int n, i;
+    int n;
     char c = 0;
     String answer = new String("");
     int index = 5;

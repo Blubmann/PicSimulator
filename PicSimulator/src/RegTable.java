@@ -6,16 +6,21 @@ import javax.swing.JScrollPane;
 import javax.swing.JTable;
 import javax.swing.table.DefaultTableModel;
 
+
+/**
+ * Klasse, die die Registertabelle auf der GUI anzeigt und aktualisiert.
+ */
 public class RegTable extends JTable {
 	private Object[][] bank0 = new Object[128][2];
 	private Object[][] bank1 = new Object[128][2];
     private String[] titel = {"Register(in hex)","Wert(in hex)"};
-    private int[] register0 = ParDecInt.reg.bank0;
-    private int[] register1 = ParDecInt.reg.bank1;
+    private int[] register0 = Worker.reg.bank0;
+    private int[] register1 = Worker.reg.bank1;
     private JTable table = new JTable();
     
-    /**Initialisiert die Tabelle auf der Gui mit Namen der wichtigsten Registerstellen und lädt Inhalte 
-     *von vorinitialisierten Registerinhalten rein
+    /**
+     * Initialisiert die Tabelle auf der Gui mit Namen der wichtigsten Registerstellen und lädt Inhalte 
+     * von vorinitialisierten Registerinhalten rein
      */
     public RegTable(JScrollPane scrollPane){
     	int count=0;
@@ -59,7 +64,10 @@ public class RegTable extends JTable {
 		table.getColumnModel().getColumn(1).setPreferredWidth(100);	
     }
     
-    /**Updated die Tabelle auf der Gui, wenn die Methode refreshGui() aufgerufen wird oder der Button für Bank0 gedrückt wird**/
+    
+    /**
+     * Updatet die Tabelle auf der Gui, wenn die Methode refreshGui() aufgerufen wird oder der Button für Bank0 gedrückt wird
+     */
     public void updateTable0(JScrollPane scrollPane){
     	int count=0;
     	for(int k=0;k<128;k++){
@@ -82,6 +90,10 @@ public class RegTable extends JTable {
 		table.getColumnModel().getColumn(1).setPreferredWidth(100);	
     }
     
+    
+    /**
+     * Updatet die Tabelle auf der Gui, wenn die Methode refreshGui() aufgerufen wird oder der Button für Bank1 gedrückt wird
+     */
     public void updateTable1(JScrollPane scrollPane){
     	int count=0;
     	for(int k=0;k<128;k++){

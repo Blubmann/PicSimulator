@@ -1,4 +1,8 @@
-public class ParDecInt extends Thread{
+/**
+ * Der Arbeiter im Hintergrund, der Befehle erkennt und vorgibt in welcher Reihenfolge 
+ */
+
+public class Worker extends Thread{
 	public String[] code;
 	public static int[] instructions;
 	public static int[] lineMarker;
@@ -74,14 +78,14 @@ public class ParDecInt extends Thread{
 	         t.start ();
 	      }
 	}
-	public ParDecInt(){
+	public Worker(){
 		
 	}
 	
 	/**ParDecInt bekommt ein Array übergeben, indem der die relevanten Quellcodezeilen als String gespechert sind.
 	 * Der Opcode wird aus den Zeilen extrahiert und in eine Integerzahl umgewandelt.
 	 */
-	public ParDecInt(String[] icode){
+	public Worker(String[] icode){
 		this.code = icode;
 		int CodeCount = 0;		
 		int[] newInst = new int[this.code.length]; 
@@ -248,7 +252,7 @@ public class ParDecInt extends Thread{
             int k = instructions[line] & 255;
             System.out.println("CALL, k ist " + k);
             cpu.call(k);
-            System.out.println(ParDecInt.reg.getPC());
+            System.out.println(Worker.reg.getPC());
 		}
 		else if (instructions[line] == 100) {
 			cpu.clrwdt();
@@ -258,7 +262,7 @@ public class ParDecInt extends Thread{
             int k = instructions[line] & 2047;
             System.out.println("GOTO, k ist " + k);
             cpu.instGoto(k);
-            System.out.println(ParDecInt.reg.getPC());
+            System.out.println(Worker.reg.getPC());
 		}
 		else if (instructions[line] >= 14336 && instructions[line] <= 14591) {
             int k = instructions[line] & 255;

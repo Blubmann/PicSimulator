@@ -11,11 +11,16 @@ import javax.swing.table.AbstractTableModel;
 import javax.swing.table.DefaultTableCellRenderer;
 import javax.swing.table.DefaultTableModel;
  
+/**
+ * Die Klasse CodeTable ist für die Darstellung der Codetabelle, sowie für die Breakpoints und den Codehighliner zuständig
+ */
 public class CodeTable extends JTable{
 	JCheckBox checkBox = new javax.swing.JCheckBox(); 
 	JTable table = new JTable();
-
-	/**Initialisiert die Tabelle beim Starten des Programms**/
+	
+	/**
+	 * Initialisiert die Tabelle beim Starten des Programms
+	 */
 	public CodeTable(JScrollPane scrollPane){
 		Vector title = new Vector();
 		title.add( "BP" );
@@ -36,7 +41,10 @@ public class CodeTable extends JTable{
 		table.getColumnModel().getColumn(1).setPreferredWidth(475);
 	}
 	
-	/**Setzt den Inhalt der Tabelle nach dem öffnen eines lst-Files**/
+	
+	/**
+	 * Setzt den Inhalt der Tabelle nach dem öffnen eines lst-Files
+	 */
 	public void setTable(JScrollPane scrollPane, Vector vec){
 		Vector title = new Vector();
 		title.add( "BP" );
@@ -67,12 +75,20 @@ public class CodeTable extends JTable{
 		scrollPane.setViewportView(table);
 	}
 	
+	
+	/**
+	 * Wir bei jedem Update aufgerufen, damit die passenden Codezeile markiert wird
+	 */
 	public void updateHighliner(){
-		table.setRowSelectionInterval(ParDecInt.lineMarker[ParDecInt.reg.getPC()]-1, ParDecInt.lineMarker[ParDecInt.reg.getPC()]-1);
+		table.setRowSelectionInterval(Worker.lineMarker[Worker.reg.getPC()]-1, Worker.lineMarker[Worker.reg.getPC()]-1);
 	}
 	
+	
+	/**
+	 * Die Methode überprüft ob ein Breakpoint gesetzt wurde und stoppt die Ausführung der Befehle
+	 */
 	public void getBreakpointandStop(){
-		int row = ParDecInt.lineMarker[ParDecInt.reg.getPC()];
+		int row = Worker.lineMarker[Worker.reg.getPC()];
 		Boolean nextBP=(Boolean) table.getValueAt(row, 0);
 		System.out.println("Breakpoint "+nextBP);
 		if(nextBP!=null){

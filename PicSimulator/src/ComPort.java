@@ -1,10 +1,7 @@
-import com.sun.org.apache.bcel.internal.util.ByteSequence;
 import gnu.io.CommPort;
 import gnu.io.CommPortIdentifier;
 import gnu.io.SerialPort;
 import java.io.*;
-import java.nio.charset.Charset;
-import java.util.*;
 
 /** ComPort dient zur Ansteuerung des Comm-Ports über die Oberfläche.
  * Es können die Register RA und RB mit den jeweiligen TRIS angesteuert
