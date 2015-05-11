@@ -16,7 +16,7 @@ import javax.swing.table.DefaultTableModel;
  */
 public class CodeTable extends JTable{
 	JCheckBox checkBox = new javax.swing.JCheckBox(); 
-	JTable table = new JTable();
+	static JTable table = new JTable();
 	
 	/**
 	 * Initialisiert die Tabelle beim Starten des Programms
@@ -81,6 +81,13 @@ public class CodeTable extends JTable{
 	 */
 	public void updateHighliner(){
 		table.setRowSelectionInterval(Worker.lineMarker[Worker.reg.getPC()]-1, Worker.lineMarker[Worker.reg.getPC()]-1);
+	}
+	
+	/**
+	 * Methode um den Highliner manuell zu setzen, zum Beispiel beim Reset.
+	 */
+	public static void setHighliner(int val){
+		table.setRowSelectionInterval(Worker.lineMarker[val], Worker.lineMarker[val]);
 	}
 	
 	

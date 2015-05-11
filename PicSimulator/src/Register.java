@@ -148,6 +148,7 @@ public class Register {
 		this.bank0[INTCON] = 0;
 		this.bank1[INTCON] = 0;
 		stack.clear();
+		MainGUI.codetab.setHighliner(0);
 	}
 	
 	

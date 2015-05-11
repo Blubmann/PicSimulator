@@ -41,7 +41,7 @@ public class Hardwareansteuerung {
    */
   SerialPort serialPort;
   
-  /** Variable zum speichern des ausgewählten CommPort.
+  /** Variable zum speichern des ausgewählten ComPort.
    */
   CommPort commPort;
   
@@ -59,7 +59,7 @@ public class Hardwareansteuerung {
   
   
   /** 
-   * Methode um den CommPort zu vebinden.
+   * Methode um den ComPort zu vebinden.
    */
   void connect( String portName ) throws Exception {
       CommPortIdentifier portIdentifier = CommPortIdentifier.getPortIdentifier(portName);
@@ -76,12 +76,17 @@ public class Hardwareansteuerung {
   
   
   /** 
-   * Methode um den aktuell verbundenen CommPort zu trennen und wieder frei zu geben.
+   * Methode um den aktuell verbundenen ComPort zu trennen und wieder frei zu geben.
    */
   public void close(){
       serialPort.close();
   }
   
+  
+  /**
+   * Die Methode gibt den Inhalt der Register an den Encoder und setzt dessen Rückgabewerte ensprechend zu einem String
+   * zusammen, damit die write-Methode den String senden kann.
+   */
   public static void sendRS232() throws Exception {
     
     String p_a = encodeData(Worker.reg.bank0[Worker.reg.PORTA]);
@@ -93,6 +98,10 @@ public class Hardwareansteuerung {
     
   }
   
+  
+  /**
+   * Schreibt den String per OutputStreamWriter auf den seriellen Port.
+   */
   public static void write(String s) throws Exception {
     out.write(s);
     out.flush();
@@ -100,6 +109,9 @@ public class Hardwareansteuerung {
   }
   
   
+  /**
+   * Methode um gesetzte Ports auf der Software zu erkennen, damit diese im Pic gesetzt werden können.
+   */
   public static ArrayList<Integer> read() throws Exception {
     int n;
     char c = 0;
@@ -124,8 +136,6 @@ public class Hardwareansteuerung {
       return null;
       
     }
-    
-    //delay(1);
 
     ArrayList<Integer> decodedValues = new ArrayList<Integer>();
     decodedValues = decodeData(answer);
@@ -141,18 +151,11 @@ public class Hardwareansteuerung {
     }
   }
   
-  private static void delay(int a) {
-    
-    try {
-      
-      Thread.sleep(a);
-      
-    } catch (InterruptedException e) {
-      
-      
-    }
-  }
-  
+  /**
+   * Die Methode benutzt die Werte der Ports, die im Register stehen. Mithilfe der ersten Funktion wird das Highnibble extrahiert
+   * und wie im Datenblatt beschrieben verarbeitet. Das Ergebnis ist eine Hex-Zahl, die in ein Char gewandelt wird. In c1 steht
+   * ein Zeichen, dass dem Ascii-Code entspricht. Selbiges passiert für c2. Zum Schluss wird ein String zurückgegeben. 
+   */
   private static String encodeData(int b) {
     
     char c1 = (char) (0x30 + ((b & 0xF0) >> 4));
@@ -162,6 +165,7 @@ public class Hardwareansteuerung {
     return "" + c1 + c2;
     
   }
+  
   
   private static ArrayList<Integer> decodeData(String s) {
     
