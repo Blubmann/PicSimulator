@@ -202,12 +202,9 @@ public class Register {
 	public void refreshGUI(){
 		setGuiFlags();
 		if(MainGUI.comPortEnable){
-		 	//updateCom();
-			//updatePortAComPort();
-			//updatePortBComPort();
 			try {
-				Hardwareansteuerung.sendRS232();
-				ArrayList<Integer> answer = Hardwareansteuerung.read();
+				ComPort.sendRS232();
+				ArrayList<Integer> answer = ComPort.read();
 				Worker.reg.bank0[Worker.reg.PORTA]= answer.get(0);
 				System.out.println("Das steht in anser0 "+answer.get(0));
 				System.out.println("Das steht in Bank0A "+bank0[PORTA]);
@@ -230,33 +227,6 @@ public class Register {
 		}else{
 			MainGUI.regtab.updateTable1(MainGUI.scrollPane_1);
 		}
-	}
-	
-	
-	public void updateCom(){
-		System.out.println("Ich bin ein Test");
-		MainGUI.comPort.writeOut();
-		MainGUI.comPort.readIn();
-	}
-	
-	
-	public void updatePortAComPort(){
-		MainGUI.comPort.updatePortA(MainGUI.getPinsPortA());
-		int portA = MainGUI.comPort.getInputPortA();
-		System.out.println("PortA enthält bei der Übergabe "+portA);
-		bank0[PORTA]=portA;
-		System.out.println("Im Register an PortA steht "+portA);
-		MainGUI.comPort.updatePortA(portA);
-		MainGUI.setPinsPortA();
-	}
-	
-	
-	public void updatePortBComPort(){
-		MainGUI.comPort.updatePortB(MainGUI.getPinsPortB());
-		int portB = MainGUI.comPort.getInputPortB();
-		bank0[PORTB]=portB;
-		MainGUI.comPort.updatePortB(portB);
-		MainGUI.setPinsPortB();
 	}
 	
 	
@@ -500,7 +470,7 @@ public class Register {
 	
 	
 	/**
-	 * Methode für den Cycle. die Laufzeit wird entsprechen der Frequenz berechnet. Prüft ob ein Interrupt an 
+	 * Methode für den Cycle. Die Laufzeit wird entsprechen der Frequenz berechnet. Prüft ob ein Interrupt an 
 	 */
 	public void addCycle(){
 		cycleCounter++;
@@ -823,7 +793,7 @@ public class Register {
 	public void checkWDTReset(){
 		if(watchDog==0){
 			watchDog=18000;
-			MainGUI.run=false;
+			//MainGUI.run=false;
 			setPrescaler();
 			refreshGUI();
 			reset();

@@ -27,6 +27,7 @@ public class ComPortConnector extends JFrame {
      * Variable, die die ID des CommPorts speichert
      */
     static CommPortIdentifier portId;
+    private final JLabel lblNewLabel = new JLabel("Bitte einen ComPort ausw\u00E4hlen!");
     
     /**
      * Konstruktor der die Komponenten initialisert.
@@ -80,6 +81,9 @@ public class ComPortConnector extends JFrame {
         });
 
         btnCancel.setText("Cancel");
+        lblNewLabel.setBounds(34, 2, 329, 30);
+        
+        getContentPane().add(lblNewLabel);
         btnCancel.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
                 cancelButtonActionPerformed(evt);

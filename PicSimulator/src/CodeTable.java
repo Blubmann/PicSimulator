@@ -83,6 +83,7 @@ public class CodeTable extends JTable{
 		table.setRowSelectionInterval(Worker.lineMarker[Worker.reg.getPC()]-1, Worker.lineMarker[Worker.reg.getPC()]-1);
 	}
 	
+	
 	/**
 	 * Methode um den Highliner manuell zu setzen, zum Beispiel beim Reset.
 	 */

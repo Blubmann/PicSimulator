@@ -51,8 +51,7 @@ public class MainGUI extends JFrame{
 	public Worker worker;
 	public static CodeTable codetab;
 	public static RegTable regtab;
-    public static ComPort comPort;
-    public static Hardwareansteuerung penis;
+    public static ComPort comport;
 	public static JScrollPane scrollPane = new JScrollPane();
 	public static JScrollPane scrollPane_1 = new JScrollPane();
 	public static JScrollPane scrollPane_2 = new JScrollPane();
@@ -169,7 +168,7 @@ public class MainGUI extends JFrame{
 		mntmHelp.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent arg0) {
 				try {
-					Desktop.getDesktop().open(new File("PIC_VIEW.pdf"));
+					Desktop.getDesktop().open(new File("Datenblatt.pdf"));
 				} catch (IOException e1) {
 	
 					e1.printStackTrace();
@@ -912,9 +911,9 @@ public class MainGUI extends JFrame{
 	 * Methode um ausgew‰hlten Comport zu initialisieren und aktivieren.
 	 */
 	public static void connectComPort(String comPortName){
-		penis = new Hardwareansteuerung(Worker.reg.bank0[Worker.reg.TRISA], Worker.reg.bank0[Worker.reg.PORTA],Worker.reg.bank0[Worker.reg.TRISB],Worker.reg.bank0[Worker.reg.PORTB]);
+		comport = new ComPort();
 		try{
-			penis.connect(comPortName);
+			comport.connect(comPortName);
 			comPortEnable= true;
 			btnConnect.setText("Disconnect");
 			btnConnect.setEnabled(true);
@@ -928,7 +927,7 @@ public class MainGUI extends JFrame{
 	 * MEthode um den aktuellen Comport zu schlieﬂen.
 	 */
 	public static void disconnectComPort(){
-		penis.close();
+		comport.close();
         btnConnect.setText("Connect");
 		btnConnect.setEnabled(true);
         comPortEnable = false;

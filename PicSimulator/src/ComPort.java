@@ -1,229 +1,181 @@
 import gnu.io.CommPort;
 import gnu.io.CommPortIdentifier;
 import gnu.io.SerialPort;
-import java.io.*;
 
-/** ComPort dient zur Ansteuerung des Comm-Ports über die Oberfläche.
- * Es können die Register RA und RB mit den jeweiligen TRIS angesteuert
- * und ausgelesen werden.
+import java.io.InputStreamReader;
+import java.io.OutputStream;
+import java.io.OutputStreamWriter;
+import java.io.UnsupportedEncodingException;
+import java.util.ArrayList;
+import java.util.Enumeration;
+
+/**
+ * TODO
  */
 public class ComPort {
+  private static OutputStream out;
+  private static InputStreamReader in;
+  private static char CR = '\r';
+  
+  /** 
+   * Variable zum zwischenspeichern des TRIS-A Wertes.
+   * Initialisert mit 31, Wert nach Power-On-Reset
+   */
+  private int trisA = 31;
+  
+  /** Variable zum zwischenspeichern des PORT-A Wertes.
+   * Initialisert mit 0, Wert nach Power-On-Reset
+   */
+  private int portA = 0;
+  
+  /** Variable zum zwischenspeichern des TRIS-B Wertes.
+   * Initialisert mit 255, Wert nach Power-On-Reset
+   */
+  private int trisB = 255;
+  
+  /** Variable zum zwischenspeichern des PORT-B Wertes.
+   * Initialisert mit 0, Wert nach Power-On-Reset
+   */
+  private int portB = 0;
+  
+  /** Variable zum speichern des ausgewählten SerialPort.
+   */
+  SerialPort serialPort;
+  
+  /** Variable zum speichern des ausgewählten ComPort.
+   */
+  CommPort commPort;
+  
+  /** 
+   * Konstruktor für ComPort.
+   */
+  public ComPort() {}
+  
+  
+  /** 
+   * Methode um den ComPort zu vebinden.
+   */
+  void connect( String portName ) throws Exception {
+      CommPortIdentifier portIdentifier = CommPortIdentifier.getPortIdentifier(portName);
+      if ( portIdentifier.isCurrentlyOwned() ) {
+          System.out.println("Error: Port is currently in use");
+      } else {
+          commPort = portIdentifier.open(this.getClass().getName(),2000);
+          serialPort = (SerialPort) commPort;
+          serialPort.setSerialPortParams(4800,SerialPort.DATABITS_8,SerialPort.STOPBITS_1,SerialPort.PARITY_NONE);
+          in = new InputStreamReader(serialPort.getInputStream());
+          out = serialPort.getOutputStream();
+      }
+  }
+  
+  
+  /** 
+   * Methode um den aktuell verbundenen ComPort zu trennen und wieder frei zu geben.
+   */
+  public void close(){
+      serialPort.close();
+  }
+  
+  
+  /**
+   * Die Methode gibt den Inhalt der Register an den Encoder und setzt dessen Rückgabewerte ensprechend zu einem String
+   * zusammen, damit die write-Methode den String senden kann.
+   */
+  public static void sendRS232() throws Exception {
+    byte data[] = new byte[9];
+    data[0] = (byte) getHighNibbles(Worker.reg.bank1[Worker.reg.TRISA]);
+    data[1] = (byte) getLowNibbles(Worker.reg.bank1[Worker.reg.TRISA]);
+    data[2] = (byte) getHighNibbles(Worker.reg.bank0[Worker.reg.PORTA]);
+    data[3] = (byte) getLowNibbles(Worker.reg.bank0[Worker.reg.PORTA]);
+    data[4] = (byte) getHighNibbles(Worker.reg.bank1[Worker.reg.TRISB]);
+    data[5] = (byte) getLowNibbles(Worker.reg.bank1[Worker.reg.TRISB]);
+    data[6] = (byte) getHighNibbles(Worker.reg.bank0[Worker.reg.PORTB]);
+    data[7] = (byte) getLowNibbles(Worker.reg.bank0[Worker.reg.PORTB]);
+    data[8] = (byte) '\r';
+    write(data);
     
-    /** Variable zum zwischenspeichern des TRIS-A Wertes.
-     * Initialisert mit 31, Wert nach Power-On-Reset
-     */
-    private int trisA = 31;
+  }
+  
+  
+  public static int getHighNibbles(int val){
+	  val = (0x30 + ((val & 0xF0) >> 4));
+	  return val;
+  }
+  
+  
+  public static int getLowNibbles(int val){
+	  val = (0x30 + (val & 0x0F));
+	  return val;
+  }
+  /**
+   * Schreibt den String per OutputStreamWriter auf den seriellen Port.
+   */
+  public static void write(byte[] data) throws Exception {
+    out.write(data);
+    out.flush();
     
-    /** Variable zum zwischenspeichern des PORT-A Wertes.
-     * Initialisert mit 0, Wert nach Power-On-Reset
-     */
-    private int portA = 0;
+  }
+  
+  
+  /**
+   * Methode um gesetzte Ports auf der Software zu erkennen, damit diese im Pic gesetzt werden können.
+   */
+  public static ArrayList<Integer> read() throws Exception {
+    int n;
+    char c = 0;
+    String answer = new String("");
+    int index = 5;
     
-    /** Variable zum zwischenspeichern des TRIS-B Wertes.
-     * Initialisert mit 255, Wert nach Power-On-Reset
-     */
-    private int trisB = 255;
-    
-    /** Variable zum zwischenspeichern des PORT-B Wertes.
-     * Initialisert mit 0, Wert nach Power-On-Reset
-     */
-    private int portB = 0;
-    
-    /** Variable zum speichern des ausgewählten SerialPort.
-     */
-    SerialPort serialPort;
-    
-    /** Variable zum speichern des ausgewählten CommPort.
-     */
-    CommPort commPort;
-    
-    /** Konstruktor für ComPort.
-     * Initialisiert die Werte von TrisA, TrisB, PortA und PortB, so kann
-     * der CommPort auch im laufenden Betrieb zugeschaltet werden.
-     */
-    public ComPort(int aTrisA, int aPortA, int aTrisB, int aPortB) {
-        trisA = aTrisA;
-        portA = aPortA;
-        trisB = aTrisB;
-        portB = aPortB;
+    while (c != CR && in.ready() && index > 0) {
+      
+      n = in.read();
+      
+      if (n != -1) {
+        
+        c = (char) n;
+        answer += c;
+        index--;
+        
+      }
     }
     
-    /** Methode um den CommPort zu vebinden.
-     */
-    void connect( String portName ) throws Exception {
-        CommPortIdentifier portIdentifier = CommPortIdentifier.getPortIdentifier(portName);
-        if ( portIdentifier.isCurrentlyOwned() ) {
-            System.out.println("Error: Port is currently in use");
-        } else {
-            commPort = portIdentifier.open(this.getClass().getName(),2000);
-            serialPort = (SerialPort) commPort;
-            serialPort.setSerialPortParams(4800,SerialPort.DATABITS_8,SerialPort.STOPBITS_1,SerialPort.PARITY_NONE);
-            writeOut();
-            readIn();
-        }
+    if (index <= 0 && c != CR) {
+      System.out.println("Fehle, kein Eendezeichen erfasst!");
+      return null;
     }
-    
-    /** Methode um den aktuell verbundenen CommPort zu trennen und wieder frei zu geben.
-     */
-    public void close(){
-        serialPort.close();
-    }
-    
-    /** Methode um die obersten Bits 4-7 einer Integer-Zahl zu bekommen.
-     */
-    private int getHighNibble(int value){
-        for(int i = 0; i < 4; i++){
-            value = value & ~(1 << i);
-        }
-        for(int i = 31; i > 7; i--){
-            value = value & ~(1 << i);
-        }
-        value = value >> 4;
-        return value;
-    }
-    
-    /** Methode um die obersten Bits 0-3 einer Integer-Zahl zu bekommen.
-     */
-    private int getLowNibble(int value){
-        for(int i = 31; i > 3; i--){
-            value = value & ~(1 << i);
-        }
-        return value;
-    }
-    
-    /** Methode um ein Nibble so zu verändern, dass es von der Hardware gelesen werden kann.
-     */
-    private int setNibbleToSend(int nibble) throws Exception{
-        if( nibble < 0 || nibble > 15){
-            Exception exception = new Exception(); throw exception;
-        }
-        int valueToSend = 0x30 + nibble;
-        return valueToSend;
-    }
-    
-    /** Methode um den im Zwischenspeicher liegenden PortA-Wert auszugeben.
-     */
-    public int getInputPortA(){
-    	System.out.println("PortA enthält vor der Übergabe "+portA);
-        return portA;
-    }
-    
-    /** Methode um den im Zwischenspeicher liegenden PortB-Wert auszugeben.
-     */
-    public int getInputPortB(){
-        return portB;
-    }
-    
-    /** Methode um einen neuen Wert in PortA zu speichern und diesen an die Hardware zu senden.
-     */
-    public void updatePortA(int portAnewValue){
-        portA = portAnewValue;
-        writeOut();
-        readIn();
-    }
-    
-    /** Methode um einen neuen Wert in PortB zu speichern und diesen an die Hardware zu senden.
-     */
-    public void updatePortB(int portBnewValue){
-        portB = portBnewValue;
-        writeOut();
-        readIn();
-    }
-    
-    /** Methode um einen neuen Wert in TrisA zu speichern und diesen an die Hardware zu senden.
-     */
-    public void updateTrisA(int trisAnewValue){
-        trisA = trisAnewValue;
-        writeOut();
-        readIn();
-    }
-    
-    /** Methode um einen neuen Wert in TrisB zu speichern und diesen an die Hardware zu senden.
-     */
-    public void updateTrisB(int trisBnewValue){
-        trisB = trisBnewValue;
-        writeOut();
-        readIn();
-    }
-    
-    /** Methode um die Werte von PortA, TrisA, PortB und TrisB als Byte-Array zu bekommen.
-     * Die Daten sidn dabei bereits sendefertig, also mit 0x30h bestückt.
-     * @return Gibt die aktuellen Werte von TrisA, PortA, TrisB und PortB in dieser Reihenfolge
-     * sendefertig als Byte-Array zurück.
-     */
-    private byte[] getValuesAsByteArray(){
-        byte data[] = new byte[9];
-        try {
-            data[0] = (byte) setNibbleToSend(getHighNibble(trisA));    //Tris A 3xH
-            data[1] = (byte) setNibbleToSend(getLowNibble(trisA));    //Tris A 3xL
-            data[2] = (byte) setNibbleToSend(getHighNibble(portA));    //Port A 3xH
-            data[3] = (byte) setNibbleToSend(getLowNibble(portA));    //Port A 3xL
-            data[4] = (byte) setNibbleToSend(getHighNibble(trisB));    //Tris B 3xH
-            data[5] = (byte) setNibbleToSend(getLowNibble(trisB));    //Tris B 3xL
-            data[6] = (byte) setNibbleToSend(getHighNibble(portB));    //Port B 3xH
-            data[7] = (byte) setNibbleToSend(getLowNibble(portB));    //Port B 3xL
-            data[8] = (byte) '\r'; // CR
-        } catch (Exception ex) {
-            System.out.println("Fehler: Tris oder PortWerte ausserhalb des Bereichs");
-            ex.printStackTrace();
-            System.exit(1);
-        }
-        return data;
-    }
-    
-    /** Methode um die Daten an die Hardware zu senden.
-     * Die aktuellen Daten aus den Variablen TrisA, PortA, TrisB und PortB werden
-     * an die Hardware gesendet.
-     */
-    public void writeOut(){
-        try {
-            OutputStream out = serialPort.getOutputStream();
-            out.write(getValuesAsByteArray());
-            out.close();
-        } catch (IOException ex) {
-            System.out.println("Fehler: Outstream konnte nicht geöffent werden!");
-            ex.printStackTrace();
-            System.exit(1);
-        }
-    }
-    
-    /** Methode um die aktuellen daten aus der Hardware auszulesen.
-     * Die Variablen PortA und PortB werden mit den aktuellen
-     * Hardwaredaten überschrieben. Dies geht nur, wenn vorher ein writeOut()
-     * gemacht wurde.
-     */
-    public void readIn(){
-        try {
-            InputStream in = serialPort.getInputStream();
-            byte c = 0;
-            int portAB[] = new int[100];
-            int counter = 0;
-            while ( c > -1 ) {
-                c = (byte)in.read();
-                //System.out.print("C ist " +in.read()+"\n");
-                if(c < 0){break;}
-                portAB[counter] = (int) c;
-                //System.out.print("PortAB " +counter+ " mit dem Wert "+portAB[counter]+"\n");
-                counter++;
-            }
-            if(portAB[0] > 48){
-                updatePortsFromReadIn(portAB);
-            }
-            in.close();
-        } catch ( IOException e ) {
-            e.printStackTrace();
-            System.exit(1);
-        }
-    }
-    
-    /**  Methode um die von der Hardware zurückgegebenen Werte zu dekodieren und
-     * den Variablen zuzuweisen.
-     */
-    private void updatePortsFromReadIn(int portAB[]){
-        portA = ((portAB[0]-0x32) << 4) + (portAB[1]-0x30);
-        System.out.println("Ich schreibe " + portA+ " in PortA");
-        portB = ((portAB[2]-0x30) << 4) + (portAB[3]-0x30);
-        System.out.println("Ich schreibe " +portB+ " an PortB");
-    }
-}
 
+    ArrayList<Integer> decodedValues = new ArrayList<Integer>();
+    decodedValues = decodeData(answer);
+    
+    if (decodedValues.size() > 0) {
+      
+      return decodedValues;
+      
+    } else {
+      
+      return null;
+      
+    }
+  }  
+  
+  
+  /**
+   * Dekodiert die gelesenen Werte um sie am PIC anzeigen zu können.
+   */
+  private static ArrayList<Integer> decodeData(String s) {
+    ArrayList<Integer> tokens = new ArrayList<Integer>();
+      int a = (((int) (s.charAt(0) - 0x30) & 0x0F) << 4) | ((int) (s.charAt(1) - 0x30) & 0x0F);
+      tokens.add(a);
+      int b = (((int) (s.charAt(2) - 0x30) & 0x0F) << 4) | ((int) (s.charAt(3) - 0x30) & 0x0F);
+      tokens.add(b);
+    
+    if (tokens.size() > 0) {
+      
+      return tokens;
+      
+    } else {
+      
+      return null;
+    } 
+  }
+}
