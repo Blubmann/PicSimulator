@@ -7,12 +7,8 @@ import javax.swing.JComboBox;
 import javax.swing.JFrame;
 import javax.swing.JLabel;
 
-import java.awt.BorderLayout;
-
-import javax.swing.JPanel;
-
-/** ComPortConnector ist eine kleine GUI, die zum auswählen eines der der verfügbaren
- * CommPorts dient.
+/** 
+ * ComPortConnector ist eine kleine GUI, die zum Auswählen eines der verfügbaren ComPorts dient.
  */
 public class ComPortConnector extends JFrame {
 	
@@ -22,16 +18,19 @@ public class ComPortConnector extends JFrame {
     private JButton btnCancel = new JButton("Cancel");
     private JLabel jLabel1 = new JLabel();;
     
-    /** Variable die eine Auflistung der verfügbaren CommPorts ermöglicht
+    /** 
+     * Variable die eine Auflistung der verfügbaren CommPorts ermöglicht
      */
     static Enumeration portList;
     
-    /** Variable, die die ID des CommPorts speichert
+    /** 
+     * Variable, die die ID des CommPorts speichert
      */
     static CommPortIdentifier portId;
+    private final JLabel lblNewLabel = new JLabel("Bitte einen ComPort ausw\u00E4hlen!");
     
-    
-    /** Konstruktor der die Komponenten initialisert.
+    /**
+     * Konstruktor der die Komponenten initialisert.
      */
     public ComPortConnector() {
     	setResizable(false);
@@ -40,7 +39,9 @@ public class ComPortConnector extends JFrame {
         setVisible(true);
     }
     
-    /** Methode um die verfügbaren CommPorts auszulesen und anzuzeigen.
+    
+    /** 
+     * Methode um die verfügbaren CommPorts auszulesen und anzuzeigen.
      */
     private void findComPorts(){
         portList = CommPortIdentifier.getPortIdentifiers();
@@ -51,7 +52,10 @@ public class ComPortConnector extends JFrame {
             }
         }
     }
-    /** Methode die zum Initialiseren der Komponenten dient.
+    
+    
+    /** 
+     * Methode die zum Initialiseren der Komponenten dient.
      */
     private void initComponents() {
     	
@@ -69,8 +73,6 @@ public class ComPortConnector extends JFrame {
         btnCancel.setBounds(255, 42, 89, 23);
         getContentPane().add(btnCancel);
 
-        jLabel1.setText("Please choose the COM-Port you want to connect to.");
-
         btnConnect.setText("Connect");
         btnConnect.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
@@ -79,6 +81,9 @@ public class ComPortConnector extends JFrame {
         });
 
         btnCancel.setText("Cancel");
+        lblNewLabel.setBounds(34, 2, 329, 30);
+        
+        getContentPane().add(lblNewLabel);
         btnCancel.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
                 cancelButtonActionPerformed(evt);
@@ -86,19 +91,23 @@ public class ComPortConnector extends JFrame {
         });
     }
 
-    /** Methode zum Bedienen des Connect-Buttons.
+    
+    /** 
+     * Methode zum Bedienen des Connect-Buttons.
      * Beim Drücken des Connect-Buttons wird zu dem ausgewählten CommPort verbunden
      */
-    private void connectButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_connectButtonActionPerformed
+    private void connectButtonActionPerformed(java.awt.event.ActionEvent evt) {
         MainGUI.connectComPort((String)comPortChooser.getSelectedItem());
         this.dispose();
     }
 
-    /** Methode zum Bedienen des Cancel-Buttons.
+    
+    /** 
+     * Methode zum Bedienen des Cancel-Buttons.
      * Beim Drücken des Cancel-Buttons wird das Fenster wieder geschlossen, eine 
      * Verbindung wird nicht hergestellt
      */
-    private void cancelButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_cancelButtonActionPerformed
+    private void cancelButtonActionPerformed(java.awt.event.ActionEvent evt) {
         this.dispose();
     }
 }

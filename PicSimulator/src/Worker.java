@@ -1,6 +1,11 @@
-public class ParDecInt extends Thread{
+/**
+ * Der Arbeiter im Hintergrund, der Befehle erkennt und vorgibt in welcher Reihenfolge 
+ */
+
+public class Worker extends Thread{
 	public String[] code;
 	public static int[] instructions;
+	public static int[] lineMarker;
 	private Thread t;
 	private int i=0;
 	public static PicCPU cpu = new PicCPU();
@@ -16,6 +21,8 @@ public class ParDecInt extends Thread{
 					break;
 				}
 				try {
+					MainGUI.codetab.updateHighliner();
+					reg.setBank();
 					i=reg.getPC();
 					decode(i);
 					reg.statusToMemory();
@@ -24,6 +31,7 @@ public class ParDecInt extends Thread{
 					reg.checkInterrupt();
 					sleep(1000000000/MainGUI.slider.getValue());
 					reg.readGui();
+					MainGUI.codetab.getBreakpointandStop();
 					/**
 					System.out.println("Status 0: "+reg.getStatusReg(0));
 					System.out.println("Status 1: "+reg.getStatusReg(1));
@@ -38,7 +46,6 @@ public class ParDecInt extends Thread{
 					System.out.println("PortA: "+reg.getRegister0(5));
 					System.out.println("PortB: "+reg.getRegister0(6));
 					**/
-
 				} catch (InterruptedException e) {
 					// TODO Auto-generated catch block
 					e.printStackTrace();
@@ -47,7 +54,9 @@ public class ParDecInt extends Thread{
 			MainGUI.run=false;
 		}
 		i=reg.getPC();
-		if(MainGUI.step=true && i<=(instructions.length-1)){
+		if(MainGUI.step=true && i<=(instructions.length)){
+				MainGUI.codetab.updateHighliner();
+				reg.setBank();
 				decode(i);
 				reg.setBank();
 				reg.statusToMemory();
@@ -69,14 +78,14 @@ public class ParDecInt extends Thread{
 	         t.start ();
 	      }
 	}
-	public ParDecInt(){
+	public Worker(){
 		
 	}
 	
 	/**ParDecInt bekommt ein Array übergeben, indem der die relevanten Quellcodezeilen als String gespechert sind.
 	 * Der Opcode wird aus den Zeilen extrahiert und in eine Integerzahl umgewandelt.
 	 */
-	public ParDecInt(String[] icode){
+	public Worker(String[] icode){
 		this.code = icode;
 		int CodeCount = 0;		
 		int[] newInst = new int[this.code.length]; 
@@ -88,13 +97,14 @@ public class ParDecInt extends Thread{
 			String opcode = singleLines.substring(5, 9);
 			String LineNumber = singleLines.substring(20, 25);
 			opcodeInt = Integer.parseInt(opcode, 16);
-			lineInt = Integer.parseInt(LineNumber, 16);
-			System.out.println("Dezimaler Befehlscode "+opcodeInt);
+			lineInt = Integer.parseInt(LineNumber, 10);
+			System.out.println("Dezimaler Befehlscode "+opcodeInt +" in Zeile "+lineInt);
 			newInst[CodeCount] = opcodeInt;
 			newLineNumber[CodeCount] = lineInt;
 			CodeCount++;
 		}
 		instructions=newInst;
+		lineMarker=newLineNumber;
 	}
 	
 	/**Die Methode bekommt beim Drücken der Starttaste den extrahierten Opcode übergeben und 
@@ -223,8 +233,8 @@ public class ParDecInt extends Thread{
             System.out.println("BTFSC, f ist " + f +" b ist " + b);
 		}
 		else if(instructions[line] >= 7168 && instructions[line] <= 8191){
-			int f = instructions[line] & 127;
             int b = getBits(instructions[line] & 896);
+			int f = instructions[line] & 127;
             cpu.btfss(f, b);
             System.out.println("BTFSS, f ist " + f +" b ist " + b);
 		}
@@ -242,7 +252,7 @@ public class ParDecInt extends Thread{
             int k = instructions[line] & 255;
             System.out.println("CALL, k ist " + k);
             cpu.call(k);
-            System.out.println(ParDecInt.reg.getPC());
+            System.out.println(Worker.reg.getPC());
 		}
 		else if (instructions[line] == 100) {
 			cpu.clrwdt();
@@ -252,7 +262,7 @@ public class ParDecInt extends Thread{
             int k = instructions[line] & 2047;
             System.out.println("GOTO, k ist " + k);
             cpu.instGoto(k);
-            System.out.println(ParDecInt.reg.getPC());
+            System.out.println(Worker.reg.getPC());
 		}
 		else if (instructions[line] >= 14336 && instructions[line] <= 14591) {
             int k = instructions[line] & 255;
@@ -302,6 +312,8 @@ public class ParDecInt extends Thread{
 			return 0;
 		case 128:
 			return 1;
+		case 256:
+            return 2;
 		case 384:
             return 3;
         case 512:

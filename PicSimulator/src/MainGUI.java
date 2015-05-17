@@ -1,4 +1,5 @@
 import java.awt.BorderLayout;
+import java.awt.Desktop;
 import java.awt.EventQueue;
 
 import javax.swing.JFrame;
@@ -31,6 +32,7 @@ import java.io.BufferedReader;
 import java.io.File;
 import java.io.FileReader;
 import java.io.IOException;
+import java.util.ArrayList;
 import java.util.Vector;
 
 import javax.swing.JList;
@@ -40,14 +42,16 @@ import javax.swing.JSlider;
 import javax.swing.JLabel;
 import javax.swing.JRadioButton;
 
-
+/**
+ * Die Klasse ist für die Darstellung und Verwaltung der GUI da.
+ */
 public class MainGUI extends JFrame{
 
 	private JPanel contentPane;
-	public ParDecInt pardecint;
-	private CodeTable codetab;
+	public Worker worker;
+	public static CodeTable codetab;
 	public static RegTable regtab;
-    private static ComPort comPort;
+    public static ComPort comport;
 	public static JScrollPane scrollPane = new JScrollPane();
 	public static JScrollPane scrollPane_1 = new JScrollPane();
 	public static JScrollPane scrollPane_2 = new JScrollPane();
@@ -64,6 +68,7 @@ public class MainGUI extends JFrame{
 	public static JTextField textField_Laufzeit = new JTextField();
 	public static JTextField textField_Watchdog = new JTextField();
 	public static JTextField textField_Frequenz = new JTextField();
+	public static JTextField textField_Prescaler = new JTextField();
 	static JRadioButton radioButtonPortAPin0 = new JRadioButton("");
 	static JRadioButton radioButtonPortAPin1 = new JRadioButton("");
 	static JRadioButton radioButtonPortAPin2 = new JRadioButton("");
@@ -96,8 +101,9 @@ public class MainGUI extends JFrame{
 	public static boolean run;
 	public static boolean step;
 	public static boolean comPortEnable=false;
-	private JButton btnStart = new JButton("Start");
-	private JButton btnStepbystep = new JButton("Step-by-Step");
+	public static JButton btnStart = new JButton("Start");
+	public static JButton btnStepbystep = new JButton("Step-by-Step");
+	private JButton btnReset = new JButton("Reset");
 	private static JButton btnConnect = new JButton("Connect");
 	private final JLabel lblFrequenz = new JLabel("Frequenz");
 	private final JLabel lblLaufzeit = new JLabel("Laufzeit");
@@ -119,6 +125,7 @@ public class MainGUI extends JFrame{
 		});
 	}
 
+	
 	/**
 	 * Create the frame.
 	 */
@@ -127,7 +134,7 @@ public class MainGUI extends JFrame{
 		textField_Frequenz.setBounds(296, 12, 46, 20);
 		textField_Frequenz.setColumns(10);
 		textField_Watchdog.setEditable(false);
-		textField_Watchdog.setBounds(592, 727, 86, 20);
+		textField_Watchdog.setBounds(797, 727, 86, 20);
 		textField_Watchdog.setColumns(10);
 		textField_Laufzeit.setEditable(false);
 		textField_Laufzeit.setBounds(392, 503, 86, 20);
@@ -153,6 +160,23 @@ public class MainGUI extends JFrame{
 		});
 		mnMen.add(mntmOpen);
 		
+		
+		/**
+		 * actionListener für den Menüpunkt "Help" um damit eine PDF aufzurufen
+		 */
+		JMenuItem mntmHelp = new JMenuItem("Help");
+		mntmHelp.addActionListener(new ActionListener() {
+			public void actionPerformed(ActionEvent arg0) {
+				try {
+					Desktop.getDesktop().open(new File("Datenblatt.pdf"));
+				} catch (IOException e1) {
+	
+					e1.printStackTrace();
+				}
+			}
+		});
+		mnMen.add(mntmHelp);
+		
 		JMenuItem mntmExit = new JMenuItem("Exit");
 		mnMen.add(mntmExit);
 		contentPane = new JPanel();
@@ -160,14 +184,23 @@ public class MainGUI extends JFrame{
 		setContentPane(contentPane);
 		contentPane.setLayout(null);
 		
+		
+		/**
+		 * Actionlistener für den Startknopf. Wenn noch keine Ausführung stattfindet(run=false), wird die Variable run auf 
+		 * true gesetzt(dies wird später für die Überprüfung benötigt, ob der Start oder Step-by-Step Button gedrückt wurde)
+		 * der Button bekommt das Label "Stop". Außerdem wird der Step-by-Step Button deaktiviert, damit dieser nicht gedrückt
+		 * werden kann und unter Umständen zu einem unvorhergesehenen Verhalten führt. Es wird auch noch der Thread für die
+		 * Abarbeitung des Programmcodes gestartet. Wird der Button danach ncoheinmal gedrückt, wird wieder in
+		 * den Normalzustand gewechselt.
+		 */
 		btnStart.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent ev) {
 				if(run==false){
 					run= true;
 					step =false;
 					btnStart.setEnabled(false);
-					ParDecInt pardecintThread = new ParDecInt();
-					pardecintThread.start(); 
+					Worker WorkerThread = new Worker();
+					WorkerThread.start(); 
 					btnStart.setText("Stop");
 					btnStart.setEnabled(true);
 					btnStepbystep.setEnabled(false);
@@ -182,7 +215,8 @@ public class MainGUI extends JFrame{
 			}
 		});
 		btnStart.setBounds(10, 11, 89, 23);
-		contentPane.add(btnStart);		
+		contentPane.add(btnStart);	
+		btnStart.setEnabled(false);
 		
 		
 		scrollPane.setBounds(358, 15, 698, 465);
@@ -193,6 +227,9 @@ public class MainGUI extends JFrame{
 		contentPane.add(scrollPane_1);
 		regtab = new RegTable(scrollPane_1);
 		
+		/**
+		 * Knopf um die Ansicht der Bank auf Bank0 zu wechseln
+		 */
 		JButton btnBank = new JButton("Bank0");
 		btnBank.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent arg0) {
@@ -203,6 +240,9 @@ public class MainGUI extends JFrame{
 		btnBank.setBounds(22, 71, 89, 23);
 		contentPane.add(btnBank);
 		
+		/**
+		 * Knopf um die Ansicht der Bank auf Bank1 zu wechseln
+		 */
 		JButton button = new JButton("Bank1");
 		button.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
@@ -213,16 +253,20 @@ public class MainGUI extends JFrame{
 		button.setBounds(110, 71, 89, 23);
 		contentPane.add(button);
 		
+		/**
+		 * ActionListener für den Step-by-Step Button
+		 */
 		btnStepbystep.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
 				run= false;
 				step =true;
-				ParDecInt pardecintThread = new ParDecInt();
-		        pardecintThread.start(); 
+				Worker WorkerThread = new Worker();
+		        WorkerThread.start(); 
 			}
 		});
 		btnStepbystep.setBounds(98, 11, 101, 23);
 		contentPane.add(btnStepbystep);
+		btnStepbystep.setEnabled(false);
 		
 		slider.setBounds(237, 37, 95, 23);
 		contentPane.add(slider);
@@ -306,6 +350,11 @@ public class MainGUI extends JFrame{
 		radioButtonPortATris0.setBounds(110, 719, 21, 23);
 		contentPane.add(radioButtonPortATris0);
 		
+		/**
+		 * ActonListener für den Comport Button. Besteht noch keine Verbindung mit einer seriellen Schnittstelle, wird ein 
+		 * Objekt der Klasse ComPortConnector erzeugt. Es wird die entsprechende GUI angezeigt. ISt eine serielle Schnittstelle
+		 * verbunden, so wird diese beim nochmaligen Drücken des Buttons unterbrochen
+		 */
 		btnConnect.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent arg0) {
 				if(!comPortEnable){
@@ -438,7 +487,7 @@ public class MainGUI extends JFrame{
 		contentPane.add(radioButtonPortBPin7);
 		
 		
-		scrollPane_2.setBounds(499, 530, 130, 171);
+		scrollPane_2.setBounds(704, 530, 130, 171);
 		contentPane.add(scrollPane_2);
 		scrollPane_2.setViewportView(stackList);
 		
@@ -466,81 +515,109 @@ public class MainGUI extends JFrame{
 		
 		contentPane.add(lblLaufzeit);
 		contentPane.add(textField_Laufzeit);
-		lblStack.setBounds(499, 506, 46, 14);
+		lblStack.setBounds(704, 506, 46, 14);
 		
 		contentPane.add(lblStack);
-		lblWatchdog.setBounds(499, 730, 62, 14);
+		lblWatchdog.setBounds(704, 730, 62, 14);
 		
 		contentPane.add(lblWatchdog);
 		contentPane.add(textField_Watchdog);
-		radioButton_Watchdog.setBounds(565, 725, 21, 23);
+		radioButton_Watchdog.setBounds(770, 725, 21, 23);
 		contentPane.add(radioButton_Watchdog);
 		
 		contentPane.add(textField_Frequenz);
+		
+		JLabel lblPrescaler = new JLabel("Prescaler");
+		lblPrescaler.setBounds(520, 506, 46, 14);
+		contentPane.add(lblPrescaler);
+		
+
+		textField_Prescaler.setEditable(false);
+		textField_Prescaler.setBounds(586, 503, 46, 20);
+		contentPane.add(textField_Prescaler);
+		textField_Prescaler.setColumns(10);
+		
+		/**
+		 * ActionListener für den Reset Button. Ruft passende Methoden auf um den Pic in den Resetzustand zu bringen. Es werden
+		 * entsprechende Anpassungen an der GUI durchgeführt.
+		 */
+		btnReset.addActionListener(new ActionListener() {
+			public void actionPerformed(ActionEvent arg0) {
+				run = false;
+				try {
+					Thread.sleep(100);
+				} catch (InterruptedException e) {
+					// TODO Auto-generated catch block
+					e.printStackTrace();
+				}
+				Worker.reg.reset();
+				Worker.reg.refreshGUI();
+				btnStart.setText("Start");
+				btnStepbystep.setEnabled(true);
+			}
+		});
+		btnReset.setEnabled(false);
+		btnReset.setBounds(10, 37, 89, 23);
+		contentPane.add(btnReset);
 	}	
 	
-	/**Erstellt den "Datei öffnen"-Dialog, prüft ob eine Datei ausgewählt wurde und übergibt diese an die 
-	 * Methode readandwrite()
+	
+	/**
+	 * Erstellt den "Datei öffnen"-Dialog(es werden nur .lst-Dateien akzeptiert), prüft ob eine Datei ausgewählt wurde und 
+	 * übergibt diese an die Methode readandwrite(). Die Buttons werden für den Gebrauch freigegeben.
 	 */
 	public void openclicked() {
-		File file =null;
-		/** Öffnen des Dialogs für die Auswahl der Datei**/
+		File file = null;
 		JFileChooser open = new JFileChooser();
 		open.setDialogTitle("Datei öffnen");
-		/**Begrenzt die Auswahl auf lst-Files**/
 		open.setAcceptAllFileFilterUsed(false);
 		open.addChoosableFileFilter(new FileNameExtensionFilter("LST-Files", "LST"));
-		/** rVal bekommt bei bestätigen eine Konstante übergeben**/
 		int rVal = open.showOpenDialog(null);
-		/**Prüfen einer Konstante, welcher Button gedrückt wurde**/
 		if (rVal == JFileChooser.APPROVE_OPTION) {
-			/**Ausgewählte Datei wird gespeichert, die Codetabelle auf der GUI wird gelöscht, die Datei wird weitergereicht**/
             file = open.getSelectedFile();
             codetab.removeAll();
             readandwrite(file);
+            btnStart.setEnabled(true);
+            btnStepbystep.setEnabled(true);
+            btnReset.setEnabled(true);
         }else if(rVal==JFileChooser.CANCEL_OPTION){
         	System.out.println("JFileChooser canceled");
         }
 	}
 	
-	/**readandwrite ließt die Datei zeilenweise aus, filtert die relevanten Codezeilen heraus und übergibt diese 
-	 * an die Klasse ParDecInt. Außerdem werden alle Codezeilen in die Codetabelle geschrieben.
+	
+	/**
+	 * readandwrite ließt die Datei zeilenweise aus. Es werden relevante Codezeilen gezählt und ein Array mit dieser Größe 
+	 * angelegt. Dann wird die Datei ein zweites Mal gelesen. Es werden die relevanten von den "unrelevante" Codezeilen
+	 * getrennt und seperat gespeichert. Die Klasse Codetabelle bekommt den Vector mit allen Codezeilen übergeben und stellt
+	 * diese entsprechend da. Der Worker erhält das Array mit den relevanten Codezeilen.
 	 */
 	private void readandwrite(File file){
 		String[] Buffer; //Buffer für Programmcode
-		int j= 0;
+		int j = 0;
 		int lineCount = 0;
 		String record = null;
 		try{
 			FileReader fr = new FileReader(file);
 			BufferedReader br = new BufferedReader(fr);
 			BufferedReader countbr = new BufferedReader(new FileReader(file));
-			/**Zählen der Zeilen mit Programmcode um ein entsprechende Arraygröße für relevanten Code zu erstellen**/
 			while ((record = countbr.readLine()) != null) {
 	            if (!record.startsWith("    ")) {
 	                lineCount++;
 	            }
 	        }
-			Buffer = new String[lineCount];
-			Vector tableData = new Vector(); //Vector für Tabellen Daten
-			/**File wird Zeile für Zeile ausgelesen und die relevanten Codezeilen in das Array Buffer geschrieben,
-			 * Der komplette Quellcode wird in ein Vektor geschrieben und über setTable auf der GUI angezeigt
-			 */
+			Buffer = new String[lineCount];	
+			Vector tableData = new Vector();
 	        while ((record = br.readLine()) != null) {
 	        	Vector vec = new Vector();
-	        	/**Relevanten Code filtern**/
 	        	if (!record.startsWith("    ")) {
 	        		Buffer[j] = record;
 	        		j++;
 	        	}
-	        	/**Vektor eins wird ein Boolean(für die Checkboxes). Vektor zwei wird der Sourcecode, 
-	        	 * wobei die ersten 20 Zeichen abgeschnitten werden, da diese nicht dargestellt werden müssen
-	        	 */
 	        	vec.add(checkbox); 
 	        	record = record.substring(20);
 	        	vec.add(record + "\n");
 	        	tableData.addElement(vec);
-	        	
 	        	
 	           /**Vector<Object> vector = new Vector<Object>();
 	           for (int i = 0; i < list.getModel().getSize(); i++) {
@@ -553,8 +630,10 @@ public class MainGUI extends JFrame{
 				list.setListData(vector);**/
 	        	//System.out.println(tableData);
 	        }
+	       
 	        codetab.setTable(scrollPane, tableData);
-	        pardecint = new ParDecInt(Buffer);
+	        worker = new Worker(Buffer);
+	        codetab.updateHighliner();
 	        br.close();
 			countbr.close();
 			//System.out.println(Buffer[1]);
@@ -564,34 +643,40 @@ public class MainGUI extends JFrame{
         }
 	}
 	
+	
+	/**
+	 * Gibt zurück ob der Radiobutton Watchdog gesetzt ist
+	 */
 	public static boolean getWatchdogEnable(){
-		if(radioButton_Watchdog.isSelected()==true){
+		if(radioButton_Watchdog.isSelected() == true){
 			return true;
 		}else{
 			return false;
 		}
 	}
 	
-	/**Folgende Methoden lesen die gesetzten Radiobuttons aus, 
+	
+	/**
+	 * Folgende Methoden lesen die gesetzten Radiobuttons aus, 
 	 * bzw. holen sich den aktuellen Registerinhalt und setzen die Radobuttons entsprechend
 	 */
 	public static int getPinsPortA(){
 		int buf[] = new int[5];
-		int buffer=0;
+		int buffer = 0;
 		if(radioButtonPortAPin0.isSelected()==true){
-			buf[0]=1;
+			buf[0] = 1;
 		}else{
-			buf[0]=0;
+			buf[0] = 0;
 		}
 		if(radioButtonPortAPin1.isSelected()==true){
-			buf[1]=1;
+			buf[1] = 1;
 		}else{
-			buf[1]=0;
+			buf[1] = 0;
 		}
 		if(radioButtonPortAPin2.isSelected()==true){
-			buf[2]=1;
+			buf[2] = 1;
 		}else{
-			buf[2]=0;
+			buf[2] = 0;
 		}
 		if(radioButtonPortAPin3.isSelected()==true){
 			buf[3]=1;
@@ -611,7 +696,7 @@ public class MainGUI extends JFrame{
 	}
 	
 	 public static void setPinsPortA() {
-        int[] port = ParDecInt.reg.getPortA();
+        int[] port = Worker.reg.getPortA();
 
         if (port[0] == 1) {
             radioButtonPortAPin0.setSelected(true);
@@ -645,7 +730,7 @@ public class MainGUI extends JFrame{
 	}
 	      
 	public static void setTrisPortA(){
-		int[] trisA = ParDecInt.reg.getTrisA();
+		int[] trisA = Worker.reg.getTrisA();
 
         if (trisA[0] == 1) {
         	radioButtonPortATris0.setSelected(true);
@@ -671,9 +756,6 @@ public class MainGUI extends JFrame{
         	radioButtonPortATris4.setSelected(true);
         } else {
         	radioButtonPortATris4.setSelected(false);
-        }
-        if(comPortEnable){
-        	comPort.updatePortA(ParDecInt.reg.bank1[ParDecInt.reg.TRISA]);
         }
 	}
 	
@@ -728,7 +810,7 @@ public class MainGUI extends JFrame{
 	}
 	
 	public static void setPinsPortB() {
-        int[] port = ParDecInt.reg.getPortB();
+        int[] port = Worker.reg.getPortB();
 
         if (port[0] == 1) {
             radioButtonPortBPin0.setSelected(true);
@@ -780,7 +862,7 @@ public class MainGUI extends JFrame{
 	}
 	
 	public static void setTrisPortB(){
-		int[] trisB = ParDecInt.reg.getTrisB();
+		int[] trisB = Worker.reg.getTrisB();
 
 		 if (trisB[0] == 1) {
 			 radioButtonPortBTris0.setSelected(true);
@@ -822,15 +904,16 @@ public class MainGUI extends JFrame{
         } else {
         	radioButtonPortBTris7.setSelected(false);
         }
-        if(comPortEnable){
-        	comPort.updatePortB(ParDecInt.reg.bank1[ParDecInt.reg.TRISB]);
-        }
 	}
 	
+	
+	/**
+	 * Methode um ausgewählten Comport zu initialisieren und aktivieren.
+	 */
 	public static void connectComPort(String comPortName){
-		comPort = new ComPort(ParDecInt.reg.bank0[ParDecInt.reg.TRISA], ParDecInt.reg.bank0[ParDecInt.reg.PORTA],ParDecInt.reg.bank0[ParDecInt.reg.TRISB],ParDecInt.reg.bank0[ParDecInt.reg.PORTB]);
+		comport = new ComPort();
 		try{
-			comPort.connect(comPortName);
+			comport.connect(comPortName);
 			comPortEnable= true;
 			btnConnect.setText("Disconnect");
 			btnConnect.setEnabled(true);
@@ -839,8 +922,12 @@ public class MainGUI extends JFrame{
 		}
 	}
 	
+	
+	/**
+	 * MEthode um den aktuellen Comport zu schließen.
+	 */
 	public static void disconnectComPort(){
-        comPort.close();
+		comport.close();
         btnConnect.setText("Connect");
 		btnConnect.setEnabled(true);
         comPortEnable = false;
